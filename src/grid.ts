@@ -18,6 +18,8 @@ export class Grid {
     if (startColumn) this.startColumn = startColumn;
     if (startRow) this.startRow = startRow;
 
+    ``;
+
     if (data) this._data = data;
   }
 
