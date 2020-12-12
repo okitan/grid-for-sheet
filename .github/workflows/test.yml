@@ -15,7 +15,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
       - run: npm ci
       - name: test
-        uses: mattallty/jest-github-action@v1
+        uses: mattallty/jest-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   lint:
