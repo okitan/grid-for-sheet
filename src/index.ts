@@ -1,4 +1,2 @@
-
-export function sayHelloWorld(world: string) {
-  return `Hello ${world}`;
-}
+export * from "./cell";
+export * from "./grid";
