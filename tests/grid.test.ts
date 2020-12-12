@@ -46,10 +46,15 @@ describe(Grid, () => {
         data: [["文字", 1]],
       });
 
-      expect(grid.getData()).toEqual([
+      const expected = [
         ["", "行1", "行2"],
         ["列1", "文字", 1],
-      ]);
+      ];
+
+      expect(grid.getData()).toEqual(expected);
+
+      // check no data corruption
+      expect(grid.getData()).toEqual(expected);
     });
   });
 

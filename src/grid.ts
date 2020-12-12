@@ -66,16 +66,15 @@ export class Grid<T = unknown, C = string, R = string> {
     if (this.showColumnHeader) {
       if (!this.columnItems)
         throw new Error("showColumnHeader requries columnItems");
-      data.unshift(this.columnItems);
+      data.unshift([...this.columnItems]);
     }
 
     if (this.showRowHeader) {
-      const rowItems = this.rowItems;
+      if (!this.rowItems) throw new Error("showRowHeader requries rowItems");
 
-      if (!rowItems) throw new Error("showRowHeader requries rowItems");
-
-      // TODO: can be assign this value
-      if (this.showColumnHeader) rowItems.unshift("");
+      const rowItems = this.showColumnHeader
+        ? ["", ...this.rowItems]
+        : this.rowItems;
 
       data.forEach((row, i) => row.unshift(rowItems[i]));
     }
