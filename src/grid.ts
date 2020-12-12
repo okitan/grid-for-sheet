@@ -23,7 +23,9 @@ export class Grid {
 
   getData(): (string | number)[][] {
     if (!this._data)
-      throw `no data given. set data in constructor or set dataGenerator and calculate`;
+      throw new Error(
+        `no data given. set data in constructor or set dataGenerator and calculate`
+      );
     return this._data;
   }
 
