@@ -1,22 +1,55 @@
 import { sheets_v4 } from "googleapis";
+import { XOR } from "ts-xor";
 
 import { Cell } from "./cell";
 
-export class Grid {
+export class Grid<T = unknown, C = string, R = string> {
   public readonly startColumn: number = 0;
   public readonly startRow: number = 0;
 
+  // TODO: C[]
+  public readonly columnItems?: string[];
+  // TODO: R[]
+  public readonly rowItems?: string[];
+
   private data?: (string | number)[][];
+
+  private readonly showColumnHeader: boolean = false;
+  private readonly showRowHeader: boolean = false;
 
   constructor({
     startColumn,
     startRow,
+    columnItems,
+    showColumnHeader,
+    rowItems,
+    showRowHeader,
     data,
-  }: { data?: Grid["data"] } & Partial<
-    Pick<Grid, "startColumn" | "startRow">
-  >) {
+  }: Partial<Pick<Grid<T, C, R>, "startColumn" | "startRow">> & // with default
+    (
+      | // showColumnHeader: true requires columnItems
+      { showColumnHeader: true; columnItems: Grid<T, C, R>["columnItems"] }
+      | { showColumnHeader?: false; columnItems?: Grid<T, C, R>["columnItems"] }
+    ) &
+    (
+      | // showRowHeader: true requires rowItems
+      { showRowHeader: true; rowItems: Grid<T, C, R>["rowItems"] }
+      | { showRowHeader?: false; rowItems?: Grid<T, C, R>["rowItems"] }
+    ) &
+    XOR<
+      // for dynamic generation
+      {},
+      // for static generation
+      { data: Grid["data"] }
+    >) {
     if (startColumn) this.startColumn = startColumn;
     if (startRow) this.startRow = startRow;
+
+    if (columnItems) this.columnItems = columnItems;
+    if (showColumnHeader) this.showColumnHeader = showColumnHeader;
+
+    if (rowItems) this.rowItems = rowItems;
+    if (showRowHeader) this.showRowHeader = showRowHeader;
 
     if (data) this.data = data;
   }
@@ -27,7 +60,27 @@ export class Grid {
         `no data given. set data in constructor or set dataGenerator and calculate`
       );
 
-    return this.data;
+    // deep copy
+    const data: (string | number)[][] = JSON.parse(JSON.stringify(this.data));
+
+    if (this.showColumnHeader) {
+      if (!this.columnItems)
+        throw new Error("showColumnHeader requries columnItems");
+      data.unshift(this.columnItems);
+    }
+
+    if (this.showRowHeader) {
+      const rowItems = this.rowItems;
+
+      if (!rowItems) throw new Error("showRowHeader requries rowItems");
+
+      // TODO: can be assign this value
+      if (this.showColumnHeader) rowItems.unshift("");
+
+      data.forEach((row, i) => row.unshift(rowItems[i]));
+    }
+
+    return data;
   }
 
   toGridData(): sheets_v4.Schema$GridData {
