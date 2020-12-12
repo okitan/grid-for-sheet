@@ -14,7 +14,10 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
       - run: npm ci
-      - run: npm test
+      - name: test
+        uses: mattallty/jest-github-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   lint:
     runs-on: ubuntu-latest
 
@@ -25,7 +28,7 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
       - run: npm ci
-      - name: Lint
+      - name: lint
         uses: mooyoul/tslint-actions@v1.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
