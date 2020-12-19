@@ -4,28 +4,33 @@ import { XOR } from "ts-xor";
 import { Cell } from "./cell";
 
 export class Grid<T = unknown, C = string, R = string> {
-  public readonly startColumn: number = 0;
-  public readonly startRow: number = 0;
+  readonly startColumn: number = 0;
+  readonly startRow: number = 0;
 
   // TODO: C[]
-  public readonly columnItems?: string[];
+  readonly columnItems?: string[];
   // TODO: R[]
-  public readonly rowItems?: string[];
+  readonly rowItems?: string[];
 
   private data?: (string | number)[][];
 
-  private readonly showColumnHeader: boolean = false;
-  private readonly showRowHeader: boolean = false;
+  readonly showColumnHeader: boolean = false;
+  readonly showRowHeader: boolean = false;
+
+  readonly sumColumnHeader: boolean = false;
 
   constructor({
     startColumn,
     startRow,
     columnItems,
     showColumnHeader,
+    sumColumnHeader,
     rowItems,
     showRowHeader,
     data,
-  }: Partial<Pick<Grid<T, C, R>, "startColumn" | "startRow">> & // with default
+  }: Partial<
+    Pick<Grid<T, C, R>, "startColumn" | "startRow" | "sumColumnHeader">
+  > & // with default
     (
       | // showColumnHeader: true requires columnItems
       { showColumnHeader: true; columnItems: Grid<T, C, R>["columnItems"] }
@@ -48,6 +53,8 @@ export class Grid<T = unknown, C = string, R = string> {
     if (columnItems) this.columnItems = columnItems;
     if (showColumnHeader) this.showColumnHeader = showColumnHeader;
 
+    if (sumColumnHeader) this.sumColumnHeader = sumColumnHeader;
+
     if (rowItems) this.rowItems = rowItems;
     if (showRowHeader) this.showRowHeader = showRowHeader;
 
@@ -63,9 +70,28 @@ export class Grid<T = unknown, C = string, R = string> {
     // deep copy
     const data: (string | number)[][] = JSON.parse(JSON.stringify(this.data));
 
+    if (this.sumColumnHeader) {
+      const columnOffset = this.startColumn + (this.showRowHeader ? 1 : 0);
+      const rowOffset = this.startRow + (this.showColumnHeader ? 1 : 0);
+
+      const rowCount = this.rowItems?.length || this.data.length;
+
+      data.unshift(
+        (this.columnItems || this.data[0]).map((_, i) => {
+          const cell = new Cell({
+            column: columnOffset + i,
+            row: rowOffset + 1,
+          });
+
+          return `=SUM(${cell.toRange({ bottom: rowCount - 1 })})`;
+        })
+      );
+    }
+
     if (this.showColumnHeader) {
       if (!this.columnItems)
         throw new Error("showColumnHeader requries columnItems");
+
       data.unshift([...this.columnItems]);
     }
 
@@ -73,7 +99,11 @@ export class Grid<T = unknown, C = string, R = string> {
       if (!this.rowItems) throw new Error("showRowHeader requries rowItems");
 
       const rowItems = this.showColumnHeader
-        ? ["", ...this.rowItems]
+        ? this.sumColumnHeader
+          ? ["", "計", ...this.rowItems]
+          : ["", ...this.rowItems]
+        : this.sumColumnHeader
+        ? ["計", ...this.rowItems]
         : this.rowItems;
 
       data.forEach((row, i) => row.unshift(rowItems[i]));

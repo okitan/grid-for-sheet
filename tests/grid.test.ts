@@ -56,6 +56,53 @@ describe(Grid, () => {
       // check no data corruption
       expect(grid.getData()).toEqual(expected);
     });
+
+    test("with sumColumnHeader and no showColumnHeader", () => {
+      const grid = new Grid({
+        columnItems: ["行1", "行2"],
+        sumColumnHeader: true,
+        rowItems: ["列1", "列2"],
+        showRowHeader: true,
+        data: [
+          ["文字1", 1],
+          ["文字2", 2],
+        ],
+      });
+
+      const expected = [
+        ["計", "=SUM(B2:B3)", "=SUM(C2:C3)"],
+        ["列1", "文字1", 1],
+        ["列2", "文字2", 2],
+      ];
+
+      expect(grid.getData()).toEqual(expected);
+    });
+
+    test("with every options", () => {
+      const grid = new Grid({
+        columnItems: ["行1", "行2"],
+        showColumnHeader: true,
+        sumColumnHeader: true,
+        rowItems: ["列1", "列2"],
+        showRowHeader: true,
+        data: [
+          ["文字1", 1],
+          ["文字2", 2],
+        ],
+      });
+
+      const expected = [
+        ["", "行1", "行2"],
+        ["計", "=SUM(B3:B4)", "=SUM(C3:C4)"],
+        ["列1", "文字1", 1],
+        ["列2", "文字2", 2],
+      ];
+
+      expect(grid.getData()).toEqual(expected);
+
+      // check no data corruption
+      expect(grid.getData()).toEqual(expected);
+    });
   });
 
   describe("#girdData", () => {
