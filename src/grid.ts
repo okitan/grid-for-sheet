@@ -70,23 +70,7 @@ export class Grid<T = unknown, C = string, R = string> {
     // deep copy
     const data: (string | number)[][] = JSON.parse(JSON.stringify(this.data));
 
-    if (this.sumColumnHeader) {
-      const columnOffset = this.startColumn + (this.showRowHeader ? 1 : 0);
-      const rowOffset = this.startRow + (this.showColumnHeader ? 1 : 0);
-
-      const rowCount = this.rowItems?.length || this.data.length;
-
-      data.unshift(
-        (this.columnItems || this.data[0]).map((_, i) => {
-          const cell = new Cell({
-            column: columnOffset + i,
-            row: rowOffset + 1,
-          });
-
-          return `=SUM(${cell.toRange({ bottom: rowCount - 1 })})`;
-        })
-      );
-    }
+    if (this.sumColumnHeader) data.unshift(this.getSumColumnHeader());
 
     if (this.showColumnHeader) {
       if (!this.columnItems)
@@ -104,7 +88,7 @@ export class Grid<T = unknown, C = string, R = string> {
     return data;
   }
 
-  getRowItems(): string[] {
+  private getRowItems(): string[] {
     const rowItems = this.rowItems
       ? this.rowItems
       : this.data
@@ -116,6 +100,25 @@ export class Grid<T = unknown, C = string, R = string> {
       this.sumColumnHeader ? "計" : undefined,
       ...rowItems,
     ].filter((e): e is string => typeof e !== "undefined");
+  }
+
+  private getSumColumnHeader(): string[] {
+    const columnOffset = this.startColumn + (this.showRowHeader ? 1 : 0);
+
+    return (this.columnItems || (this.data ? this.data[0] : [""])).map(
+      (_, i) => {
+        const from = new Cell({
+          column: columnOffset + i,
+          row: this.startRow + (this.showColumnHeader ? 1 : 0) + 1,
+        });
+        const to = new Cell({
+          column: columnOffset + i,
+          row: this.startRow + this.getRowItems().length - 1,
+        });
+
+        return `=SUM(${from.toRange(to)})`;
+      }
+    );
   }
 
   toGridData(): sheets_v4.Schema$GridData {
