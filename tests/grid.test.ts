@@ -60,7 +60,7 @@ describe(Grid, () => {
     test("with sumColumnHeader and no showColumnHeader", () => {
       const grid = new Grid({
         columnItems: ["行1", "行2"],
-        sumColumnHeader: true,
+        sumHeaderRow: true,
         rowItems: ["列1", "列2"],
         showRowHeader: true,
         data: [
@@ -82,7 +82,8 @@ describe(Grid, () => {
       const grid = new Grid({
         columnItems: ["行1", "行2"],
         showColumnHeader: true,
-        sumColumnHeader: true,
+        sumHeaderRow: true,
+        sumColumn: true,
         rowItems: ["列1", "列2"],
         showRowHeader: true,
         data: [
@@ -92,10 +93,10 @@ describe(Grid, () => {
       });
 
       const expected = [
-        ["", "行1", "行2"],
-        ["計", "=SUM(B3:B4)", "=SUM(C3:C4)"],
-        ["列1", "文字1", 1],
-        ["列2", "文字2", 2],
+        ["", "行1", "行2", ""],
+        ["計", "=SUM(B3:B4)", "=SUM(C3:C4)", ""],
+        ["列1", "文字1", 1, "=SUM(B3:C3)"],
+        ["列2", "文字2", 2, "=SUM(B4:C4)"],
       ];
 
       expect(grid.getData()).toEqual(expected);
