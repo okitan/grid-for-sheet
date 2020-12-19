@@ -17,10 +17,7 @@ export class Cell {
     const quotient = Math.floor(num / 26);
     const remainder = num % 26;
 
-    return (
-      (quotient > 0 ? Cell.numberToColumnName(quotient - 1) : "") +
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[remainder]
-    );
+    return (quotient > 0 ? Cell.numberToColumnName(quotient - 1) : "") + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[remainder];
   }
 
   column: number;
