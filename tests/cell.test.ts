@@ -22,4 +22,40 @@ describe(Cell, () => {
       `);
     });
   });
+
+  describe(".numberToColumnName", () => {
+    test.each([
+      [0, "A"],
+      [26 - 1, "Z"],
+      [26 ** 1, "AA"],
+      [26 ** 1 + 26 ** 2 - 1, "ZZ"],
+      [26 ** 1 + 26 ** 2, "AAA"],
+    ])("with column %i returns %s", (column, expected) => {
+      expect(Cell.numberToColumnName(column)).toEqual(expected);
+    });
+  });
+
+  describe("#toRange", () => {
+    test("without args returns self notation", () => {
+      const cell = new Cell({ column: 1, row: 1 });
+
+      expect(cell.toRange()).toEqual("B2");
+    });
+
+    test("with other cell retuns range", () => {
+      const cell = new Cell({ column: 1, row: 1 });
+      const other = new Cell({ column: 2, row: 2 });
+
+      expect(cell.toRange(other)).toEqual("B2:C3");
+    });
+
+    test.each([
+      [{ right: 1 }, "B2:C2"],
+      [{ bottom: 1 }, "B2:B3"],
+    ])("with %o returns %s", (position, expected) => {
+      const cell = new Cell({ column: 1, row: 1 });
+
+      expect(cell.toRange(position)).toEqual(expected);
+    });
+  });
 });
