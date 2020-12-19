@@ -98,18 +98,24 @@ export class Grid<T = unknown, C = string, R = string> {
     if (this.showRowHeader) {
       if (!this.rowItems) throw new Error("showRowHeader requries rowItems");
 
-      const rowItems = this.showColumnHeader
-        ? this.sumColumnHeader
-          ? ["", "計", ...this.rowItems]
-          : ["", ...this.rowItems]
-        : this.sumColumnHeader
-        ? ["計", ...this.rowItems]
-        : this.rowItems;
-
-      data.forEach((row, i) => row.unshift(rowItems[i]));
+      data.forEach((row, i) => row.unshift(this.getRowItems()[i]));
     }
 
     return data;
+  }
+
+  getRowItems(): string[] {
+    const rowItems = this.rowItems
+      ? this.rowItems
+      : this.data
+      ? this.data.map(() => "")
+      : [""];
+
+    return [
+      this.showColumnHeader ? "" : undefined,
+      this.sumColumnHeader ? "計" : undefined,
+      ...rowItems,
+    ].filter((e): e is string => typeof e !== "undefined");
   }
 
   toGridData(): sheets_v4.Schema$GridData {
