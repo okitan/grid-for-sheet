@@ -11,12 +11,12 @@ export class Grid<T = unknown, C = string, R = string> {
 
   private data?: (string | number)[][];
 
-  readonly columnItems?: (C | string)[];
-  readonly columnConverter?: (column: C | string, columnIndex: number) => string | number;
+  readonly columnItems?: C[];
+  readonly columnConverter?: (column: C, columnIndex: number) => string | number;
 
   // TODO: R[]
-  readonly rowItems?: (R | string)[];
-  readonly rowConverter?: (row: R | string, columnIndex: number) => string | number;
+  readonly rowItems?: R[];
+  readonly rowConverter?: (row: R, columnIndex: number) => string | number;
 
   readonly showColumnHeader: boolean = false;
   readonly showRowHeader: boolean = false;
@@ -26,9 +26,9 @@ export class Grid<T = unknown, C = string, R = string> {
 
   // dynamic
   readonly dataGenerator?: (
-    column: C | string,
+    column: C | undefined,
     columnIndex: number,
-    row: R | string,
+    row: R | undefined,
     rowIndex: number,
     args: T
   ) => string | number;
@@ -94,8 +94,8 @@ export class Grid<T = unknown, C = string, R = string> {
     const dataGenerator = this.dataGenerator;
     if (!dataGenerator) throw new Error(`no dataGenerator set`);
 
-    const columnItems = this.columnItems || [""];
-    const rowItems = this.rowItems || [""];
+    const columnItems = this.columnItems || [...Array<C>(1)];
+    const rowItems = this.rowItems || [...Array<R>(1)];
 
     return (this.data = rowItems.map((row, rowIndex) =>
       columnItems.map((column, columnIndex) => dataGenerator(column, columnIndex, row, rowIndex, args))
@@ -116,7 +116,8 @@ export class Grid<T = unknown, C = string, R = string> {
       if (!this.columnItems) throw new Error("showColumnHeader requries columnItems");
 
       const converter = this.columnConverter;
-      const columnItems = converter ? this.columnItems.map(converter) : (this.columnItems as (string | number)[]); // XXX:
+      // @ts-ignore for most case this.columnItems are string[]
+      const columnItems: (string | number)[] = converter ? this.columnItems.map(converter) : this.columnItems;
 
       data.unshift([...columnItems]);
     }
@@ -163,7 +164,7 @@ export class Grid<T = unknown, C = string, R = string> {
       ...(this.rowItems
         ? converter
           ? this.rowItems.map(converter)
-          : (this.rowItems as (string | number)[]) // XXX:
+          : this.rowItems // XXX
         : Array(this.dataRowLength).fill(""))
     );
 

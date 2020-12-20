@@ -137,20 +137,32 @@ describe(Grid, () => {
       expect(grid.getData()).toEqual(expected);
     });
 
+    test("with dataGenerator and no columnItems nor rowItems generates only one data", () => {
+      const grid = new Grid<{ hoge: string }>({
+        dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
+      });
+
+      grid.generate({ hoge: "fuga" });
+
+      const expected = [["fuga:undefined:0/undefined:0"]];
+
+      expect(grid.getData()).toEqual(expected);
+
+      expect(grid.getData().length).toEqual(grid.rowLength);
+      expect(grid.getData()[0].length).toEqual(grid.columnLength);
+    });
+
     test("with generics", () => {
       const grid = new Grid<{ hoge: string }, { fuga: string }, { ugu: string }>({
-        columnItems: ["行1", { fuga: "行2" }],
+        columnItems: [{ fuga: "行1" }, { fuga: "行2" }],
         showColumnHeader: true,
         sumHeaderRow: true,
         sumColumn: true,
-        rowItems: ["列1", { ugu: "列2" }],
+        rowItems: [{ ugu: "列1" }, { ugu: "列2" }],
         showRowHeader: true,
-        dataGenerator: (column, i, row, j, args) =>
-          `${args.hoge}:${typeof column === "string" ? column : column.fuga}:${i}/${
-            typeof row === "string" ? row : row.ugu
-          }:${j}`,
-        columnConverter: (column, i) => `${typeof column === "string" ? column : column.fuga}:${i}`,
-        rowConverter: (row, j) => `${typeof row === "string" ? row : row.ugu}:${j}`,
+        dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column?.fuga}:${i}/${row?.ugu}:${j}`,
+        columnConverter: (column, i) => `${column?.fuga}:${i}`,
+        rowConverter: (row, j) => `${row?.ugu}:${j}`,
       });
 
       grid.generate({ hoge: "fuga" });
