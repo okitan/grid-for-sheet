@@ -134,9 +134,10 @@ export class Grid<T = unknown, C = string, R = string> {
   }
 
   private getSumHeaderRow(): string[] {
+    const columnLength = this.columnItems?.length || (this.data ? this.data[0].length : 1);
     const columnOffset = this.startColumn + (this.showRowHeader ? 1 : 0);
 
-    return (this.columnItems || (this.data ? this.data[0] : [""])).map((_, i) => {
+    return [...Array(columnLength).keys()].map((i) => {
       const from = new Cell({ column: columnOffset + i, row: this.startRow + (this.showColumnHeader ? 1 : 0) + 1 });
       const to = new Cell({ column: columnOffset + i, row: this.startRow + this.getRowItems().length - 1 });
 
@@ -145,13 +146,14 @@ export class Grid<T = unknown, C = string, R = string> {
   }
 
   private getSumColumn(): string[] {
+    const rowLength = this.rowItems?.length || (this.data ? this.data.length : 1);
     const rowOffset = this.startRow + (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0);
     const columnOffset = this.startColumn + (this.showRowHeader ? 1 : 0);
 
     return [
       this.showColumnHeader ? "" : undefined,
       this.sumHeaderRow ? "" : undefined,
-      ...(this.rowItems || (this.data ? this.data.map((e) => e[0]) : [""])).map((_, i) => {
+      ...[...Array(rowLength).keys()].map((i) => {
         const from = new Cell({ column: columnOffset, row: rowOffset + i });
         const to = new Cell({ column: this.startRow + this.getColumnItems().length - 2, row: rowOffset + i });
 
