@@ -4,6 +4,8 @@ import { XOR } from "ts-xor";
 import { Cell } from "./cell";
 
 export class Grid<T = unknown, C = string, R = string> {
+  readonly sheet?: string;
+
   readonly startColumn: number = 0;
   readonly startRow: number = 0;
 
@@ -24,14 +26,15 @@ export class Grid<T = unknown, C = string, R = string> {
 
   // dynamic
   readonly dataGenerator?: (
-    args: T,
     column: C | string,
     columnIndex: number,
     row: R | string,
-    rowIndex: number
+    rowIndex: number,
+    args: T
   ) => string | number;
 
   constructor({
+    sheet,
     startColumn,
     startRow,
     columnItems,
@@ -45,7 +48,10 @@ export class Grid<T = unknown, C = string, R = string> {
     data,
     dataGenerator,
   }: Partial<
-    Pick<Grid<T, C, R>, "startColumn" | "startRow" | "sumHeaderRow" | "sumColumn" | "columnConverter" | "rowConverter">
+    Pick<
+      Grid<T, C, R>,
+      "sheet" | "startColumn" | "startRow" | "sumHeaderRow" | "sumColumn" | "columnConverter" | "rowConverter"
+    >
   > & // with default
     (
       | // showColumnHeader: true requires columnItems
@@ -63,6 +69,8 @@ export class Grid<T = unknown, C = string, R = string> {
       // for static generation
       { data: Grid<T, C, R>["data"] }
     >) {
+    if (sheet) this.sheet = sheet;
+
     if (startColumn) this.startColumn = startColumn;
     if (startRow) this.startRow = startRow;
 
@@ -90,7 +98,7 @@ export class Grid<T = unknown, C = string, R = string> {
     const rowItems = this.rowItems || [""];
 
     return (this.data = rowItems.map((row, rowIndex) =>
-      columnItems.map((column, columnIndex) => dataGenerator(args, column, columnIndex, row, rowIndex))
+      columnItems.map((column, columnIndex) => dataGenerator(column, columnIndex, row, rowIndex, args))
     ));
   }
 

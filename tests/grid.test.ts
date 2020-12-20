@@ -116,7 +116,7 @@ describe(Grid, () => {
         sumColumn: true,
         rowItems: ["列1", "列2"],
         showRowHeader: true,
-        dataGenerator: (args, column, i, row, j) => `${args.hoge}:${column}:${i}/${row}:${j}`,
+        dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
       });
 
       grid.generate({ hoge: "fuga" });
@@ -145,7 +145,7 @@ describe(Grid, () => {
         sumColumn: true,
         rowItems: ["列1", { ugu: "列2" }],
         showRowHeader: true,
-        dataGenerator: (args, column, i, row, j) =>
+        dataGenerator: (column, i, row, j, args) =>
           `${args.hoge}:${typeof column === "string" ? column : column.fuga}:${i}/${
             typeof row === "string" ? row : row.ugu
           }:${j}`,
