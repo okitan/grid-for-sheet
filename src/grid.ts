@@ -19,6 +19,11 @@ export class Grid<T = {}, C = string, R = string> {
   readonly rowConverter?: (row: R, columnIndex: number) => string | number;
 
   readonly showColumnHeader: boolean = false;
+  readonly columnHeaderFormat?:
+    | sheets_v4.Schema$CellFormat
+    | sheets_v4.Schema$CellFormat[]
+    | ((column: C | undefined, columnIndex: number) => sheets_v4.Schema$CellFormat | undefined);
+
   readonly showRowHeader: boolean = false;
 
   readonly sumHeaderRow: boolean = false;
@@ -40,6 +45,7 @@ export class Grid<T = {}, C = string, R = string> {
     columnItems,
     columnConverter,
     showColumnHeader,
+    columnHeaderFormat,
     sumHeaderRow,
     rowItems,
     rowConverter,
@@ -55,8 +61,12 @@ export class Grid<T = {}, C = string, R = string> {
   > & // with default
     (
       | // showColumnHeader: true requires columnItems
-      { showColumnHeader: true; columnItems: Grid<T, C, R>["columnItems"] }
-      | { showColumnHeader?: false; columnItems?: Grid<T, C, R>["columnItems"] }
+      {
+          showColumnHeader: true;
+          columnItems: Grid<T, C, R>["columnItems"];
+          columnHeaderFormat?: Grid<T, C, R>["columnHeaderFormat"];
+        }
+      | { showColumnHeader?: false; columnItems?: Grid<T, C, R>["columnItems"]; columnHeaderFormat?: undefined }
     ) &
     (
       | // showRowHeader: true requires rowItems
@@ -76,6 +86,7 @@ export class Grid<T = {}, C = string, R = string> {
     if (columnItems) this.columnItems = columnItems;
     if (columnConverter) this.columnConverter = columnConverter;
     if (showColumnHeader) this.showColumnHeader = showColumnHeader;
+    if (columnHeaderFormat) this.columnHeaderFormat = columnHeaderFormat;
 
     if (sumHeaderRow) this.sumHeaderRow = sumHeaderRow;
 
@@ -209,9 +220,27 @@ export class Grid<T = {}, C = string, R = string> {
     return {
       startColumn: this.startColumn,
       startRow: this.startRow,
-      rowData: this.getData().map((row) => ({
-        values: row.map((e) => Cell.data(e)),
-      })),
+      rowData: this.getData().map((row, i) => {
+        const format = this.showColumnHeader && i === 0 ? this.columnHeaderFormat : undefined;
+
+        return {
+          values: row.map((e, j) => {
+            const data = Cell.data(e);
+
+            const index = j - (this.showRowHeader ? 1 : 0);
+            if (!format || index < 0 || index >= this.dataColumnLength) return data;
+
+            const metadata =
+              typeof format === "object"
+                ? Array.isArray(format)
+                  ? format[index]
+                  : format
+                : format(this.columnItems && this.columnItems[index], index);
+
+            return metadata ? { ...data, userEnteredFormat: metadata } : data;
+          }),
+        };
+      }),
     };
   }
 }

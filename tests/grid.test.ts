@@ -206,4 +206,132 @@ describe(Grid, () => {
       `);
     });
   });
+
+  test.only("with format returns formatted Griddata", () => {
+    const grid = new Grid<{ hoge: string }>({
+      columnItems: ["行1", "行2"],
+      columnHeaderFormat: { textFormat: { bold: true } },
+      showColumnHeader: true,
+      sumHeaderRow: true,
+      sumColumn: true,
+      rowItems: ["列1", "列2"],
+      showRowHeader: true,
+      dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
+    });
+
+    expect(grid.toGridData({ hoge: "fuga" })).toMatchInlineSnapshot(`
+      Object {
+        "rowData": Array [
+          Object {
+            "values": Array [
+              Object {
+                "userEnteredValue": Object {
+                  "stringValue": "",
+                },
+              },
+              Object {
+                "userEnteredFormat": Object {
+                  "textFormat": Object {
+                    "bold": true,
+                  },
+                },
+                "userEnteredValue": Object {
+                  "stringValue": "行1",
+                },
+              },
+              Object {
+                "userEnteredFormat": Object {
+                  "textFormat": Object {
+                    "bold": true,
+                  },
+                },
+                "userEnteredValue": Object {
+                  "stringValue": "行2",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "stringValue": "",
+                },
+              },
+            ],
+          },
+          Object {
+            "values": Array [
+              Object {
+                "userEnteredValue": Object {
+                  "stringValue": "計",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "formulaValue": "=SUM(B3:B4)",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "formulaValue": "=SUM(C3:C4)",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "stringValue": "",
+                },
+              },
+            ],
+          },
+          Object {
+            "values": Array [
+              Object {
+                "userEnteredValue": Object {
+                  "stringValue": "列1",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "stringValue": "fuga:行1:0/列1:0",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "stringValue": "fuga:行2:1/列1:0",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "formulaValue": "=SUM(B3:C3)",
+                },
+              },
+            ],
+          },
+          Object {
+            "values": Array [
+              Object {
+                "userEnteredValue": Object {
+                  "stringValue": "列2",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "stringValue": "fuga:行1:0/列2:1",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "stringValue": "fuga:行2:1/列2:1",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "formulaValue": "=SUM(B4:C4)",
+                },
+              },
+            ],
+          },
+        ],
+        "startColumn": 0,
+        "startRow": 0,
+      }
+    `);
+  });
 });
