@@ -136,6 +136,34 @@ describe(Grid, () => {
       // check no data corruption
       expect(grid.getData()).toEqual(expected);
     });
+
+    test("with generics", () => {
+      const grid = new Grid<{ hoge: string }, { fuga: string }, { ugu: string }>({
+        columnItems: ["行1", { fuga: "行2" }],
+        showColumnHeader: true,
+        sumHeaderRow: true,
+        sumColumn: true,
+        rowItems: ["列1", { ugu: "列2" }],
+        showRowHeader: true,
+        dataGenerator: (args, column, i, row, j) =>
+          `${args.hoge}:${typeof column === "string" ? column : column.fuga}:${i}/${
+            typeof row === "string" ? row : row.ugu
+          }:${j}`,
+        columnConverter: (column, i) => `${typeof column === "string" ? column : column.fuga}:${i}`,
+        rowConverter: (row, j) => `${typeof row === "string" ? row : row.ugu}:${j}`,
+      });
+
+      grid.generate({ hoge: "fuga" });
+
+      const expected = [
+        ["", "行1:0", "行2:1", ""],
+        ["計", "=SUM(B3:B4)", "=SUM(C3:C4)", ""],
+        ["列1:0", "fuga:行1:0/列1:0", "fuga:行2:1/列1:0", "=SUM(B3:C3)"],
+        ["列2:1", "fuga:行1:0/列2:1", "fuga:行2:1/列2:1", "=SUM(B4:C4)"],
+      ];
+
+      expect(grid.getData()).toEqual(expected);
+    });
   });
 
   describe("#girdData", () => {

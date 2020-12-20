@@ -35,14 +35,18 @@ export class Grid<T = unknown, C = string, R = string> {
     startColumn,
     startRow,
     columnItems,
+    columnConverter,
     showColumnHeader,
     sumHeaderRow,
     rowItems,
+    rowConverter,
     showRowHeader,
     sumColumn,
     data,
     dataGenerator,
-  }: Partial<Pick<Grid<T, C, R>, "startColumn" | "startRow" | "sumHeaderRow" | "sumColumn">> & // with default
+  }: Partial<
+    Pick<Grid<T, C, R>, "startColumn" | "startRow" | "sumHeaderRow" | "sumColumn" | "columnConverter" | "rowConverter">
+  > & // with default
     (
       | // showColumnHeader: true requires columnItems
       { showColumnHeader: true; columnItems: Grid<T, C, R>["columnItems"] }
@@ -63,11 +67,13 @@ export class Grid<T = unknown, C = string, R = string> {
     if (startRow) this.startRow = startRow;
 
     if (columnItems) this.columnItems = columnItems;
+    if (columnConverter) this.columnConverter = columnConverter;
     if (showColumnHeader) this.showColumnHeader = showColumnHeader;
 
     if (sumHeaderRow) this.sumHeaderRow = sumHeaderRow;
 
     if (rowItems) this.rowItems = rowItems;
+    if (rowConverter) this.rowConverter = rowConverter;
     if (showRowHeader) this.showRowHeader = showRowHeader;
     if (sumColumn) this.sumColumn = sumColumn;
 
