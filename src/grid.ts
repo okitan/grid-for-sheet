@@ -13,7 +13,8 @@ export class Grid<T = unknown, C = string, R = string> {
   readonly columnConverter?: (column: C | string, columnIndex: number) => string | number;
 
   // TODO: R[]
-  readonly rowItems?: string[];
+  readonly rowItems?: (R | string)[];
+  readonly rowConverter?: (row: R | string, columnIndex: number) => string | number;
 
   readonly showColumnHeader: boolean = false;
   readonly showRowHeader: boolean = false;
@@ -26,7 +27,7 @@ export class Grid<T = unknown, C = string, R = string> {
     args: T,
     column: C | string,
     columnIndex: number,
-    row: string,
+    row: R | string,
     rowIndex: number
   ) => string | number;
 
@@ -101,10 +102,7 @@ export class Grid<T = unknown, C = string, R = string> {
       if (!this.columnItems) throw new Error("showColumnHeader requries columnItems");
 
       const converter = this.columnConverter;
-
-      const columnItems = converter
-        ? this.columnItems.map((c, i) => converter(c, i))
-        : (this.columnItems as (string | number)[]); // XXX:
+      const columnItems = converter ? this.columnItems.map(converter) : (this.columnItems as (string | number)[]); // XXX:
 
       data.unshift([...columnItems]);
     }
@@ -133,19 +131,29 @@ export class Grid<T = unknown, C = string, R = string> {
   }
 
   get rowLength(): number {
-    return (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0) + this.dataRownLength;
+    return (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0) + this.dataRowLength;
   }
 
-  private get dataRownLength(): number {
+  private get dataRowLength(): number {
     return this.rowItems?.length || (this.data ? this.data.length : 1);
   }
 
-  private getRowItems(): string[] {
-    const rowItems = this.rowItems ? this.rowItems : this.data ? this.data.map(() => "") : [""];
+  private getRowItems(): (string | number)[] {
+    const rowItems: (string | number)[] = [];
 
-    return [this.showColumnHeader ? "" : undefined, this.sumHeaderRow ? "計" : undefined, ...rowItems].filter(
-      (e): e is string => typeof e !== "undefined"
+    if (this.showColumnHeader) rowItems.push("");
+    if (this.sumHeaderRow) rowItems.push("計");
+
+    const converter = this.rowConverter;
+    rowItems.push(
+      ...(this.rowItems
+        ? converter
+          ? this.rowItems.map(converter)
+          : (this.rowItems as (string | number)[]) // XXX:
+        : Array(this.dataRowLength).fill(""))
     );
+
+    return rowItems;
   }
 
   private getSumHeaderRow(): string[] {
@@ -166,7 +174,7 @@ export class Grid<T = unknown, C = string, R = string> {
     return [
       this.showColumnHeader ? "" : undefined,
       this.sumHeaderRow ? "" : undefined,
-      ...[...Array(this.dataRownLength).keys()].map((i) => {
+      ...[...Array(this.dataRowLength).keys()].map((i) => {
         const from = new Cell({ column: columnOffset, row: rowOffset + i });
         const to = new Cell({ column: this.startRow + this.columnLength - 2, row: rowOffset + i });
 
