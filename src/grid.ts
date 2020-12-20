@@ -156,6 +156,7 @@ export class Grid<T = unknown, C = string, R = string> {
     return rowItems;
   }
 
+  // this does not consider showRowHeader and sumColumn
   private getSumHeaderRow(): string[] {
     const columnOffset = this.startColumn + (this.showRowHeader ? 1 : 0);
 
@@ -168,19 +169,24 @@ export class Grid<T = unknown, C = string, R = string> {
   }
 
   private getSumColumn(): string[] {
+    const sumColumn: string[] = [];
+
     const rowOffset = this.startRow + (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0);
     const columnOffset = this.startColumn + (this.showRowHeader ? 1 : 0);
 
-    return [
-      this.showColumnHeader ? "" : undefined,
-      this.sumHeaderRow ? "" : undefined,
+    if (this.showColumnHeader) sumColumn.push("");
+    if (this.sumHeaderRow) sumColumn.push("");
+
+    sumColumn.push(
       ...[...Array(this.dataRowLength).keys()].map((i) => {
         const from = new Cell({ column: columnOffset, row: rowOffset + i });
         const to = new Cell({ column: this.startRow + this.columnLength - 2, row: rowOffset + i });
 
         return `=SUM(${from.toRange(to)})`;
-      }),
-    ].filter((e): e is string => typeof e !== "undefined");
+      })
+    );
+
+    return sumColumn;
   }
 
   toGridData(): sheets_v4.Schema$GridData {
