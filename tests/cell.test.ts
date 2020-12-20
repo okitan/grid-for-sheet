@@ -12,6 +12,16 @@ describe(Cell, () => {
       `);
     });
 
+    test("with string starting with = returns formulaValue", () => {
+      expect(Cell.data("=1+1")).toMatchInlineSnapshot(`
+        Object {
+          "userEnteredValue": Object {
+            "formulaValue": "=1+1",
+          },
+        }
+      `);
+    });
+
     test("with number returns numberValue", () => {
       expect(Cell.data(1)).toMatchInlineSnapshot(`
         Object {
