@@ -117,6 +117,22 @@ export class Grid<T = unknown, C = string, R = string> {
     return data;
   }
 
+  get columnLength(): number {
+    return (this.showRowHeader ? 1 : 0) + this.dataColumnLength + (this.sumColumn ? 1 : 0);
+  }
+
+  private get dataColumnLength(): number {
+    return this.columnItems?.length || (this.data ? this.data[0].length : 1);
+  }
+
+  get rowLength(): number {
+    return (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0) + this.dataRownLength;
+  }
+
+  private get dataRownLength(): number {
+    return this.rowItems?.length || (this.data ? this.data.length : 1);
+  }
+
   private getRowItems(): string[] {
     const rowItems = this.rowItems ? this.rowItems : this.data ? this.data.map(() => "") : [""];
 
@@ -125,19 +141,10 @@ export class Grid<T = unknown, C = string, R = string> {
     );
   }
 
-  private getColumnItems(): string[] {
-    const columnItems = this.columnItems ? this.columnItems : this.data ? this.data[0].map(() => "") : [""];
-
-    return [this.showRowHeader ? "" : undefined, ...columnItems, this.sumColumn ? "" : undefined].filter(
-      (e): e is string => typeof e !== "undefined"
-    );
-  }
-
   private getSumHeaderRow(): string[] {
-    const columnLength = this.columnItems?.length || (this.data ? this.data[0].length : 1);
     const columnOffset = this.startColumn + (this.showRowHeader ? 1 : 0);
 
-    return [...Array(columnLength).keys()].map((i) => {
+    return [...Array(this.dataColumnLength).keys()].map((i) => {
       const from = new Cell({ column: columnOffset + i, row: this.startRow + (this.showColumnHeader ? 1 : 0) + 1 });
       const to = new Cell({ column: columnOffset + i, row: this.startRow + this.getRowItems().length - 1 });
 
@@ -146,16 +153,15 @@ export class Grid<T = unknown, C = string, R = string> {
   }
 
   private getSumColumn(): string[] {
-    const rowLength = this.rowItems?.length || (this.data ? this.data.length : 1);
     const rowOffset = this.startRow + (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0);
     const columnOffset = this.startColumn + (this.showRowHeader ? 1 : 0);
 
     return [
       this.showColumnHeader ? "" : undefined,
       this.sumHeaderRow ? "" : undefined,
-      ...[...Array(rowLength).keys()].map((i) => {
+      ...[...Array(this.dataRownLength).keys()].map((i) => {
         const from = new Cell({ column: columnOffset, row: rowOffset + i });
-        const to = new Cell({ column: this.startRow + this.getColumnItems().length - 2, row: rowOffset + i });
+        const to = new Cell({ column: this.startRow + this.columnLength - 2, row: rowOffset + i });
 
         return `=SUM(${from.toRange(to)})`;
       }),

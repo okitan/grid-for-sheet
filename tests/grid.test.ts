@@ -101,6 +101,9 @@ describe(Grid, () => {
 
       expect(grid.getData()).toEqual(expected);
 
+      expect(grid.getData().length).toEqual(grid.rowLength);
+      expect(grid.getData()[0].length).toEqual(grid.columnLength);
+
       // check no data corruption
       expect(grid.getData()).toEqual(expected);
     });
@@ -126,6 +129,9 @@ describe(Grid, () => {
       ];
 
       expect(grid.getData()).toEqual(expected);
+
+      expect(grid.getData().length).toEqual(grid.rowLength);
+      expect(grid.getData()[0].length).toEqual(grid.columnLength);
 
       // check no data corruption
       expect(grid.getData()).toEqual(expected);
