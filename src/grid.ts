@@ -3,7 +3,7 @@ import { XOR } from "ts-xor";
 
 import { Cell } from "./cell";
 
-export class Grid<T = unknown, C = string, R = string> {
+export class Grid<T = {}, C = string, R = string> {
   readonly sheet?: string;
 
   readonly startColumn: number = 0;
@@ -70,7 +70,6 @@ export class Grid<T = unknown, C = string, R = string> {
       { data: Grid<T, C, R>["data"] }
     >) {
     if (sheet) this.sheet = sheet;
-
     if (startColumn) this.startColumn = startColumn;
     if (startRow) this.startRow = startRow;
 
@@ -204,7 +203,9 @@ export class Grid<T = unknown, C = string, R = string> {
     return sumColumn;
   }
 
-  toGridData(): sheets_v4.Schema$GridData {
+  toGridData(args?: T): sheets_v4.Schema$GridData {
+    if (args) this.generate(args);
+
     return {
       startColumn: this.startColumn,
       startRow: this.startRow,
