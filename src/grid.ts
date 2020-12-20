@@ -7,18 +7,27 @@ export class Grid<T = unknown, C = string, R = string> {
   readonly startColumn: number = 0;
   readonly startRow: number = 0;
 
+  private data?: (string | number)[][];
+
   // TODO: C[]
   readonly columnItems?: string[];
   // TODO: R[]
   readonly rowItems?: string[];
-
-  private data?: (string | number)[][];
 
   readonly showColumnHeader: boolean = false;
   readonly showRowHeader: boolean = false;
 
   readonly sumHeaderRow: boolean = false;
   readonly sumColumn: boolean = false;
+
+  // dynamic
+  readonly dataGenerator?: (
+    args: T,
+    column: string,
+    columnIndex: number,
+    row: string,
+    rowIndex: number
+  ) => string | number;
 
   constructor({
     startColumn,
@@ -30,6 +39,7 @@ export class Grid<T = unknown, C = string, R = string> {
     showRowHeader,
     sumColumn,
     data,
+    dataGenerator,
   }: Partial<Pick<Grid<T, C, R>, "startColumn" | "startRow" | "sumHeaderRow" | "sumColumn">> & // with default
     (
       | // showColumnHeader: true requires columnItems
@@ -43,9 +53,9 @@ export class Grid<T = unknown, C = string, R = string> {
     ) &
     XOR<
       // for dynamic generation
-      {},
+      { dataGenerator: Grid<T, C, R>["dataGenerator"] },
       // for static generation
-      { data: Grid["data"] }
+      { data: Grid<T, C, R>["data"] }
     >) {
     if (startColumn) this.startColumn = startColumn;
     if (startRow) this.startRow = startRow;
@@ -60,6 +70,20 @@ export class Grid<T = unknown, C = string, R = string> {
     if (sumColumn) this.sumColumn = sumColumn;
 
     if (data) this.data = data;
+
+    if (dataGenerator) this.dataGenerator = dataGenerator;
+  }
+
+  generate(args: T): Grid<T, C, R>["data"] {
+    const dataGenerator = this.dataGenerator;
+    if (!dataGenerator) throw new Error(`no dataGenerator set`);
+
+    const columnItems = this.columnItems || [""];
+    const rowItems = this.rowItems || [""];
+
+    return (this.data = rowItems.map((row, rowIndex) =>
+      columnItems.map((column, columnIndex) => dataGenerator(args, column, columnIndex, row, rowIndex))
+    ));
   }
 
   getData(): (string | number)[][] {
