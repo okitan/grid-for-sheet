@@ -9,8 +9,9 @@ export class Grid<T = unknown, C = string, R = string> {
 
   private data?: (string | number)[][];
 
-  // TODO: C[]
-  readonly columnItems?: string[];
+  readonly columnItems?: (C | string)[];
+  readonly columnConverter?: (column: C | string, columnIndex: number) => string | number;
+
   // TODO: R[]
   readonly rowItems?: string[];
 
@@ -23,7 +24,7 @@ export class Grid<T = unknown, C = string, R = string> {
   // dynamic
   readonly dataGenerator?: (
     args: T,
-    column: string,
+    column: C | string,
     columnIndex: number,
     row: string,
     rowIndex: number
@@ -99,7 +100,13 @@ export class Grid<T = unknown, C = string, R = string> {
     if (this.showColumnHeader) {
       if (!this.columnItems) throw new Error("showColumnHeader requries columnItems");
 
-      data.unshift([...this.columnItems]);
+      const converter = this.columnConverter;
+
+      const columnItems = converter
+        ? this.columnItems.map((c, i) => converter(c, i))
+        : (this.columnItems as (string | number)[]); // XXX:
+
+      data.unshift([...columnItems]);
     }
 
     // rows last
