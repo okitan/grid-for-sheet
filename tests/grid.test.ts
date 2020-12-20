@@ -207,7 +207,7 @@ describe(Grid, () => {
     });
   });
 
-  test.only("with format returns formatted Griddata", () => {
+  test("with format returns formatted Griddata", () => {
     const grid = new Grid<{ hoge: string }>({
       columnItems: ["行1", "行2"],
       columnHeaderFormat: { textFormat: { bold: true } },
