@@ -42,33 +42,27 @@ export class Grid<T = {}, C = string, R = string> {
     sheet,
     startColumn,
     startRow,
-    columnItems,
-    columnConverter,
-    showColumnHeader,
-    columnHeaderFormat,
-    sumHeaderRow,
+    column,
     rowItems,
     rowConverter,
     showRowHeader,
     sumColumn,
     data,
     dataGenerator,
-  }: Partial<
-    Pick<
-      Grid<T, C, R>,
-      "sheet" | "startColumn" | "startRow" | "sumHeaderRow" | "sumColumn" | "columnConverter" | "rowConverter"
-    >
-  > & // with default
-    (
-      | // showColumnHeader: true requires columnItems
-      {
-          showColumnHeader: true;
-          columnItems: Grid<T, C, R>["columnItems"];
-          columnHeaderFormat?: Grid<T, C, R>["columnHeaderFormat"];
+  }: Partial<Pick<Grid<T, C, R>, "sheet" | "startColumn" | "startRow" | "sumColumn" | "rowConverter">> & {
+    column?: { sum?: boolean } & (
+      | {
+          showHeader: true;
+          items: Grid<T, C, R>["columnItems"];
+          converter?: Grid<T, C, R>["columnConverter"];
+          headerFormat?: Grid<T, C, R>["columnHeaderFormat"];
         }
-      | { showColumnHeader?: false; columnItems?: Grid<T, C, R>["columnItems"]; columnHeaderFormat?: undefined }
-    ) &
-    (
+      | {
+          showHeader?: false;
+          items?: Grid<T, C, R>["columnItems"];
+        }
+    );
+  } & (
       | // showRowHeader: true requires rowItems
       { showRowHeader: true; rowItems: Grid<T, C, R>["rowItems"] }
       | { showRowHeader?: false; rowItems?: Grid<T, C, R>["rowItems"] }
@@ -83,12 +77,15 @@ export class Grid<T = {}, C = string, R = string> {
     if (startColumn) this.startColumn = startColumn;
     if (startRow) this.startRow = startRow;
 
-    if (columnItems) this.columnItems = columnItems;
-    if (columnConverter) this.columnConverter = columnConverter;
-    if (showColumnHeader) this.showColumnHeader = showColumnHeader;
-    if (columnHeaderFormat) this.columnHeaderFormat = columnHeaderFormat;
+    if (column) {
+      if (column.items) this.columnItems = column.items;
+      if (column.showHeader) this.showColumnHeader = column.showHeader;
+      if ("converter" in column) this.columnConverter = column.converter;
+      if ("headerFormat" in column) this.columnHeaderFormat = column.headerFormat;
 
-    if (sumHeaderRow) this.sumHeaderRow = sumHeaderRow;
+      // column.sum is the sum of column, and we should add them as row
+      if (column.sum) this.sumHeaderRow = column.sum;
+    }
 
     if (rowItems) this.rowItems = rowItems;
     if (rowConverter) this.rowConverter = rowConverter;

@@ -4,7 +4,9 @@ describe(Grid, () => {
   describe("#getData", () => {
     test("returns data", () => {
       const grid = new Grid({
-        columnItems: ["行1", "行2"],
+        column: {
+          items: ["行1", "行2"],
+        },
         rowItems: ["列1"],
         data: [["文字", 1]],
       });
@@ -14,8 +16,10 @@ describe(Grid, () => {
 
     test("with showColumnHeader returns included headers", () => {
       const grid = new Grid({
-        columnItems: ["行1", "行2"],
-        showColumnHeader: true,
+        column: {
+          items: ["行1", "行2"],
+          showHeader: true,
+        },
         rowItems: ["列1"],
         data: [["文字", 1]],
       });
@@ -28,7 +32,9 @@ describe(Grid, () => {
 
     test("with showRowHeader returns included headers", () => {
       const grid = new Grid({
-        columnItems: ["行1", "行2"],
+        column: {
+          items: ["行1", "行2"],
+        },
         rowItems: ["列1"],
         showRowHeader: true,
         data: [["文字", 1]],
@@ -39,8 +45,10 @@ describe(Grid, () => {
 
     test("with showHeader both column and row returns included headers", () => {
       const grid = new Grid({
-        columnItems: ["行1", "行2"],
-        showColumnHeader: true,
+        column: {
+          items: ["行1", "行2"],
+          showHeader: true,
+        },
         rowItems: ["列1"],
         showRowHeader: true,
         data: [["文字", 1]],
@@ -59,8 +67,10 @@ describe(Grid, () => {
 
     test("with sumColumnHeader and no showColumnHeader", () => {
       const grid = new Grid({
-        columnItems: ["行1", "行2"],
-        sumHeaderRow: true,
+        column: {
+          items: ["行1", "行2"],
+          sum: true,
+        },
         rowItems: ["列1", "列2"],
         showRowHeader: true,
         data: [
@@ -80,9 +90,11 @@ describe(Grid, () => {
 
     test("with every options", () => {
       const grid = new Grid({
-        columnItems: ["行1", "行2"],
-        showColumnHeader: true,
-        sumHeaderRow: true,
+        column: {
+          items: ["行1", "行2"],
+          showHeader: true,
+          sum: true,
+        },
         sumColumn: true,
         rowItems: ["列1", "列2"],
         showRowHeader: true,
@@ -110,9 +122,11 @@ describe(Grid, () => {
 
     test("with dataGenerator returns generated data", () => {
       const grid = new Grid<{ hoge: string }>({
-        columnItems: ["行1", "行2"],
-        showColumnHeader: true,
-        sumHeaderRow: true,
+        column: {
+          items: ["行1", "行2"],
+          showHeader: true,
+          sum: true,
+        },
         sumColumn: true,
         rowItems: ["列1", "列2"],
         showRowHeader: true,
@@ -154,14 +168,16 @@ describe(Grid, () => {
 
     test("with generics", () => {
       const grid = new Grid<{ hoge: string }, { fuga: string }, { ugu: string }>({
-        columnItems: [{ fuga: "行1" }, { fuga: "行2" }],
-        showColumnHeader: true,
-        sumHeaderRow: true,
+        column: {
+          items: [{ fuga: "行1" }, { fuga: "行2" }],
+          showHeader: true,
+          sum: true,
+          converter: (column, i) => `${column?.fuga}:${i}`,
+        },
         sumColumn: true,
         rowItems: [{ ugu: "列1" }, { ugu: "列2" }],
         showRowHeader: true,
         dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column?.fuga}:${i}/${row?.ugu}:${j}`,
-        columnConverter: (column, i) => `${column?.fuga}:${i}`,
         rowConverter: (row, j) => `${row?.ugu}:${j}`,
       });
 
@@ -209,10 +225,12 @@ describe(Grid, () => {
 
   test("with format returns formatted Griddata", () => {
     const grid = new Grid<{ hoge: string }>({
-      columnItems: ["行1", "行2"],
-      columnHeaderFormat: { textFormat: { bold: true } },
-      showColumnHeader: true,
-      sumHeaderRow: true,
+      column: {
+        items: ["行1", "行2"],
+        showHeader: true,
+        sum: true,
+        headerFormat: { textFormat: { bold: true } },
+      },
       sumColumn: true,
       rowItems: ["列1", "列2"],
       showRowHeader: true,
