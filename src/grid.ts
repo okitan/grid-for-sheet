@@ -43,12 +43,9 @@ export class Grid<T = {}, C = string, R = string> {
     startColumn,
     startRow,
     column,
-    rowItems,
-    rowConverter,
-    showRowHeader,
-    sumColumn,
-    data,
+    row,
     dataGenerator,
+    data,
   }: Partial<Pick<Grid<T, C, R>, "sheet" | "startColumn" | "startRow" | "sumColumn" | "rowConverter">> & {
     column?: { sum?: boolean } & (
       | {
@@ -62,12 +59,18 @@ export class Grid<T = {}, C = string, R = string> {
           items?: Grid<T, C, R>["columnItems"];
         }
     );
-  } & (
-      | // showRowHeader: true requires rowItems
-      { showRowHeader: true; rowItems: Grid<T, C, R>["rowItems"] }
-      | { showRowHeader?: false; rowItems?: Grid<T, C, R>["rowItems"] }
-    ) &
-    XOR<
+    row?: { sum?: boolean } & (
+      | {
+          showHeader: true;
+          items: Grid<T, C, R>["rowItems"];
+          converter?: Grid<T, C, R>["rowConverter"];
+        }
+      | {
+          showHeader?: false;
+          items?: Grid<T, C, R>["rowItems"];
+        }
+    );
+  } & XOR<
       // for dynamic generation
       { dataGenerator: Grid<T, C, R>["dataGenerator"] },
       // for static generation
@@ -87,14 +90,17 @@ export class Grid<T = {}, C = string, R = string> {
       if (column.sum) this.sumHeaderRow = column.sum;
     }
 
-    if (rowItems) this.rowItems = rowItems;
-    if (rowConverter) this.rowConverter = rowConverter;
-    if (showRowHeader) this.showRowHeader = showRowHeader;
-    if (sumColumn) this.sumColumn = sumColumn;
+    if (row) {
+      if (row.items) this.rowItems = row.items;
+      if (row.showHeader) this.showRowHeader = row.showHeader;
+      if ("converter" in row) this.rowConverter = row.converter;
 
-    if (data) this.data = data;
+      // row.sum is the sum of row, and we should add them as column
+      if (row.sum) this.sumColumn = row.sum;
+    }
 
     if (dataGenerator) this.dataGenerator = dataGenerator;
+    if (data) this.data = data;
   }
 
   generate(args: T): Grid<T, C, R>["data"] {

@@ -4,10 +4,8 @@ describe(Grid, () => {
   describe("#getData", () => {
     test("returns data", () => {
       const grid = new Grid({
-        column: {
-          items: ["行1", "行2"],
-        },
-        rowItems: ["列1"],
+        column: { items: ["行1", "行2"] },
+        row: { items: ["列1"] },
         data: [["文字", 1]],
       });
 
@@ -16,11 +14,8 @@ describe(Grid, () => {
 
     test("with showColumnHeader returns included headers", () => {
       const grid = new Grid({
-        column: {
-          items: ["行1", "行2"],
-          showHeader: true,
-        },
-        rowItems: ["列1"],
+        column: { items: ["行1", "行2"], showHeader: true },
+        row: { items: ["列1"] },
         data: [["文字", 1]],
       });
 
@@ -32,11 +27,8 @@ describe(Grid, () => {
 
     test("with showRowHeader returns included headers", () => {
       const grid = new Grid({
-        column: {
-          items: ["行1", "行2"],
-        },
-        rowItems: ["列1"],
-        showRowHeader: true,
+        column: { items: ["行1", "行2"] },
+        row: { items: ["列1"], showHeader: true },
         data: [["文字", 1]],
       });
 
@@ -45,12 +37,8 @@ describe(Grid, () => {
 
     test("with showHeader both column and row returns included headers", () => {
       const grid = new Grid({
-        column: {
-          items: ["行1", "行2"],
-          showHeader: true,
-        },
-        rowItems: ["列1"],
-        showRowHeader: true,
+        column: { items: ["行1", "行2"], showHeader: true },
+        row: { items: ["列1"], showHeader: true },
         data: [["文字", 1]],
       });
 
@@ -67,12 +55,8 @@ describe(Grid, () => {
 
     test("with sumColumnHeader and no showColumnHeader", () => {
       const grid = new Grid({
-        column: {
-          items: ["行1", "行2"],
-          sum: true,
-        },
-        rowItems: ["列1", "列2"],
-        showRowHeader: true,
+        column: { items: ["行1", "行2"], sum: true },
+        row: { items: ["列1", "列2"], showHeader: true },
         data: [
           ["文字1", 1],
           ["文字2", 2],
@@ -90,14 +74,8 @@ describe(Grid, () => {
 
     test("with every options", () => {
       const grid = new Grid({
-        column: {
-          items: ["行1", "行2"],
-          showHeader: true,
-          sum: true,
-        },
-        sumColumn: true,
-        rowItems: ["列1", "列2"],
-        showRowHeader: true,
+        column: { items: ["行1", "行2"], showHeader: true, sum: true },
+        row: { items: ["列1", "列2"], showHeader: true, sum: true },
         data: [
           ["文字1", 1],
           ["文字2", 2],
@@ -122,14 +100,8 @@ describe(Grid, () => {
 
     test("with dataGenerator returns generated data", () => {
       const grid = new Grid<{ hoge: string }>({
-        column: {
-          items: ["行1", "行2"],
-          showHeader: true,
-          sum: true,
-        },
-        sumColumn: true,
-        rowItems: ["列1", "列2"],
-        showRowHeader: true,
+        column: { items: ["行1", "行2"], showHeader: true, sum: true },
+        row: { items: ["列1", "列2"], showHeader: true, sum: true },
         dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
       });
 
@@ -174,11 +146,13 @@ describe(Grid, () => {
           sum: true,
           converter: (column, i) => `${column?.fuga}:${i}`,
         },
-        sumColumn: true,
-        rowItems: [{ ugu: "列1" }, { ugu: "列2" }],
-        showRowHeader: true,
+        row: {
+          items: [{ ugu: "列1" }, { ugu: "列2" }],
+          showHeader: true,
+          sum: true,
+          converter: (row, j) => `${row?.ugu}:${j}`,
+        },
         dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column?.fuga}:${i}/${row?.ugu}:${j}`,
-        rowConverter: (row, j) => `${row?.ugu}:${j}`,
       });
 
       grid.generate({ hoge: "fuga" });
@@ -231,9 +205,7 @@ describe(Grid, () => {
         sum: true,
         headerFormat: { textFormat: { bold: true } },
       },
-      sumColumn: true,
-      rowItems: ["列1", "列2"],
-      showRowHeader: true,
+      row: { items: ["列1", "列2"], showHeader: true, sum: true },
       dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
     });
 
