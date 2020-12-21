@@ -14,7 +14,6 @@ export class Grid<T = {}, C = string, R = string> {
   readonly columnItems?: C[];
   readonly columnConverter?: (column: C, columnIndex: number) => string | number;
 
-  // TODO: R[]
   readonly rowItems?: R[];
   readonly rowConverter?: (row: R, columnIndex: number) => string | number;
 
