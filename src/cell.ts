@@ -49,6 +49,10 @@ export class Cell {
       : `${this.columnName}${this.rowNumber}`;
   }
 
+  relative({ right = 0, bottom = 0 }: { right?: number; bottom?: number }): Cell {
+    return new Cell({ sheet: this.sheet, column: this.column + right, row: this.row + bottom });
+  }
+
   toRange(cellOrPosition?: Cell | { right?: number; bottom?: number }): string {
     switch (typeof cellOrPosition) {
       case "undefined":
