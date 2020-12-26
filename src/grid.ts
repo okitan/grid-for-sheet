@@ -270,4 +270,12 @@ export class Grid<T = {}, C = string, R = string> {
 
     return data;
   }
+
+  get startCell(): Cell {
+    return new Cell({ sheet: this.sheet, column: this.startColumn, row: this.startRow });
+  }
+
+  toRange(): string {
+    return this.startCell.toRange({ right: this.columnLength, bottom: this.rowLength });
+  }
 }

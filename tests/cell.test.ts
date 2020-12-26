@@ -59,6 +59,13 @@ describe(Cell, () => {
       expect(cell.toRange(other)).toEqual("B2:C3");
     });
 
+    test("with sheet title", () => {
+      const cell = new Cell({ sheet: "シート", column: 1, row: 1 });
+      const other = new Cell({ sheet: "シート", column: 2, row: 2 });
+
+      expect(cell.toRange(other)).toEqual("'シート'!B2:C3");
+    });
+
     test.each([
       [{ right: 1 }, "B2:C2"],
       [{ bottom: 1 }, "B2:B3"],

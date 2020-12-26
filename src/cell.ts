@@ -24,10 +24,13 @@ export class Cell {
     return (quotient > 0 ? Cell.numberToColumnName(quotient - 1) : "") + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[remainder];
   }
 
+  sheet?: string;
   column: number;
   row: number;
 
-  constructor({ column, row }: Pick<Cell, "column" | "row">) {
+  constructor({ sheet, column, row }: Pick<Cell, "sheet" | "column" | "row">) {
+    this.sheet = sheet;
+
     this.column = column;
     this.row = row;
   }
@@ -41,7 +44,9 @@ export class Cell {
   }
 
   get notation(): string {
-    return `${this.columnName}${this.rowNumber}`;
+    return this.sheet
+      ? `${this.escapeSheetName(this.sheet)}!${this.columnName}${this.rowNumber}`
+      : `${this.columnName}${this.rowNumber}`;
   }
 
   toRange(cellOrPosition?: Cell | { right?: number; bottom?: number }): string {
@@ -50,7 +55,12 @@ export class Cell {
         return this.notation;
       case "object":
         if ("notation" in cellOrPosition) {
-          return `${this.notation}:${cellOrPosition.notation}`;
+          const otherCellNotation = cellOrPosition.notation;
+
+          // TODO: check sheet title is the same
+          return `${this.notation}:${
+            otherCellNotation.includes("!") ? otherCellNotation.split("!")[1] : otherCellNotation
+          }`;
         } else {
           const position = cellOrPosition;
 
@@ -65,5 +75,9 @@ export class Cell {
         const never: never = cellOrPosition;
         throw never;
     }
+  }
+
+  protected escapeSheetName(str: string): string {
+    return str.match(/^[a-zA-Z]+$/) ? str : `'${str}'`;
   }
 }
