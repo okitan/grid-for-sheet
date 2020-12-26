@@ -25,8 +25,10 @@ export class Grid<T = {}, C = string, R = string> {
     | ((column: C | undefined, columnIndex: number) => sheets_v4.Schema$CellFormat | undefined);
 
   readonly showRowHeader: boolean = false;
+  readonly rowHeaderPixelSize?: number;
 
   readonly sumHeaderRow: boolean = false;
+  readonly sumHeaderRowPixelSize?: number;
   readonly sumColumn: boolean = false;
 
   // dynamic
@@ -47,7 +49,7 @@ export class Grid<T = {}, C = string, R = string> {
     dataGenerator,
     data,
   }: Partial<Pick<Grid<T, C, R>, "sheet" | "startColumn" | "startRow" | "sumColumn" | "rowConverter">> & {
-    column?: { sum?: boolean; pixelSize?: number } & (
+    column?: { pixelSize?: number; sum?: boolean; sumPixelSize?: number } & (
       | {
           showHeader: true;
           items: Grid<T, C, R>["columnItems"];
@@ -64,6 +66,7 @@ export class Grid<T = {}, C = string, R = string> {
           showHeader: true;
           items: Grid<T, C, R>["rowItems"];
           converter?: Grid<T, C, R>["rowConverter"];
+          headerPixelSize?: number;
         }
       | {
           showHeader?: false;
@@ -88,6 +91,7 @@ export class Grid<T = {}, C = string, R = string> {
 
       // column.sum is the sum of column, and we should add them as row
       if (column.sum) this.sumHeaderRow = column.sum;
+      if (column.sumPixelSize) this.sumHeaderRowPixelSize = column.sumPixelSize;
 
       if (column.pixelSize) this.columnPixelSize = column.pixelSize;
     }
@@ -99,6 +103,8 @@ export class Grid<T = {}, C = string, R = string> {
 
       // row.sum is the sum of row, and we should add them as column
       if (row.sum) this.sumColumn = row.sum;
+
+      if ("headerPixelSize" in row) this.rowHeaderPixelSize = row.headerPixelSize;
     }
 
     if (dataGenerator) this.dataGenerator = dataGenerator;
@@ -248,8 +254,18 @@ export class Grid<T = {}, C = string, R = string> {
       }),
     };
 
-    if (this.columnPixelSize) {
-      data.columnMetadata = this.getData().map((_) => ({ pixelSize: this.columnPixelSize }));
+    if (this.rowHeaderPixelSize || this.columnPixelSize || this.sumHeaderRowPixelSize) {
+      data.columnMetadata = [];
+
+      if (this.showColumnHeader)
+        data.columnMetadata.push(this.rowHeaderPixelSize ? { pixelSize: this.rowHeaderPixelSize } : {});
+
+      if (this.columnPixelSize)
+        data.columnMetadata.push(
+          ...Array(this.dataColumnLength).fill(this.columnPixelSize ? { pixelSize: this.columnPixelSize } : {})
+        );
+      if (this.sumHeaderRow)
+        data.columnMetadata.push(this.sumHeaderRowPixelSize ? { pixelSize: this.sumHeaderRowPixelSize } : {});
     }
 
     return data;
