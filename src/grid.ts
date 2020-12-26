@@ -271,11 +271,19 @@ export class Grid<T = {}, C = string, R = string> {
     return data;
   }
 
-  get startCell(): Cell {
+  get origin(): Cell {
     return new Cell({ sheet: this.sheet, column: this.startColumn, row: this.startRow });
   }
 
+  get dataOrigin(): Cell {
+    return new Cell({
+      sheet: this.sheet,
+      column: this.startColumn + this.columnLength - this.dataColumnLength,
+      row: this.startRow + this.rowLength - this.dataRowLength,
+    });
+  }
+
   toRange(): string {
-    return this.startCell.toRange({ right: this.columnLength - 1, bottom: this.rowLength - 1 });
+    return this.origin.toRange({ right: this.columnLength - 1, bottom: this.rowLength - 1 });
   }
 }
