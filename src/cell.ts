@@ -66,14 +66,7 @@ export class Cell {
             otherCellNotation.includes("!") ? otherCellNotation.split("!")[1] : otherCellNotation
           }`;
         } else {
-          const position = cellOrPosition;
-
-          const other = new Cell({
-            column: this.column + (position.right || 0),
-            row: this.row + (position.bottom || 0),
-          });
-
-          return this.toRange(other);
+          return this.toRange(this.relative({ right: cellOrPosition.right || 0, bottom: cellOrPosition.bottom || 0 }));
         }
       default:
         const never: never = cellOrPosition;
