@@ -53,7 +53,13 @@ export class Cell {
     return new Cell({ sheet: this.sheet, column: this.column + right, row: this.row + bottom });
   }
 
-  toRange(cellOrPosition?: Cell | { right?: number; bottom?: number }): string {
+  toRange(cell?: Cell): string;
+  toRange(relative?: { right?: number; bottom?: number }): string;
+  toRange(destination?: "leftEnd" | "rightEnd" | "topEnd" | "bottomEnd"): string;
+
+  toRange(
+    cellOrPosition?: Cell | { right?: number; bottom?: number } | "leftEnd" | "rightEnd" | "topEnd" | "bottomEnd"
+  ): string {
     switch (typeof cellOrPosition) {
       case "undefined":
         return this.notation;
@@ -67,6 +73,20 @@ export class Cell {
           }`;
         } else {
           return this.toRange(this.relative({ right: cellOrPosition.right || 0, bottom: cellOrPosition.bottom || 0 }));
+        }
+      case "string":
+        switch (cellOrPosition) {
+          case "leftEnd":
+            return new Cell({ sheet: this.sheet, column: 0, row: this.row }).toRange(this);
+          case "rightEnd":
+            return `${this.notation}:${this.rowNumber}`;
+          case "topEnd":
+            return new Cell({ sheet: this.sheet, column: this.column, row: 0 }).toRange(this);
+          case "bottomEnd":
+            return `${this.notation}:${this.columnName}`;
+          default:
+            const never: never = cellOrPosition;
+            throw never;
         }
       default:
         const never: never = cellOrPosition;

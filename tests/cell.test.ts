@@ -74,5 +74,26 @@ describe(Cell, () => {
 
       expect(cell.toRange(position)).toEqual(expected);
     });
+
+    test("with leftEnd works", () => {
+      const cell = new Cell({ column: 1, row: 1 });
+
+      expect(cell.toRange("leftEnd")).toEqual("A2:B2");
+    });
+    test("with rightEnd works", () => {
+      const cell = new Cell({ column: 1, row: 1 });
+
+      expect(cell.toRange("rightEnd")).toEqual("B2:2");
+    });
+    test("with topEnd works", () => {
+      const cell = new Cell({ column: 1, row: 1 });
+
+      expect(cell.toRange("topEnd")).toEqual("B1:B2");
+    });
+    test("with bottomEnd works", () => {
+      const cell = new Cell({ column: 1, row: 1 });
+
+      expect(cell.toRange("bottomEnd")).toEqual("B2:B");
+    });
   });
 });
