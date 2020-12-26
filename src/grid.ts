@@ -276,6 +276,6 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   toRange(): string {
-    return this.startCell.toRange({ right: this.columnLength, bottom: this.rowLength });
+    return this.startCell.toRange({ right: this.columnLength - 1, bottom: this.rowLength - 1 });
   }
 }
