@@ -204,6 +204,7 @@ describe(Grid, () => {
         showHeader: true,
         sum: true,
         headerFormat: { textFormat: { bold: true } },
+        pixelSize: 7,
       },
       row: { items: ["列1", "列2"], showHeader: true, sum: true },
       dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
@@ -211,6 +212,20 @@ describe(Grid, () => {
 
     expect(grid.toGridData({ hoge: "fuga" })).toMatchInlineSnapshot(`
       Object {
+        "columnMetadata": Array [
+          Object {
+            "pixelSize": 7,
+          },
+          Object {
+            "pixelSize": 7,
+          },
+          Object {
+            "pixelSize": 7,
+          },
+          Object {
+            "pixelSize": 7,
+          },
+        ],
         "rowData": Array [
           Object {
             "values": Array [

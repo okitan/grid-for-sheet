@@ -13,6 +13,7 @@ export class Grid<T = {}, C = string, R = string> {
 
   readonly columnItems?: C[];
   readonly columnConverter?: (column: C, columnIndex: number) => string | number;
+  readonly columnPixelSize?: number;
 
   readonly rowItems?: R[];
   readonly rowConverter?: (row: R, columnIndex: number) => string | number;
@@ -46,7 +47,7 @@ export class Grid<T = {}, C = string, R = string> {
     dataGenerator,
     data,
   }: Partial<Pick<Grid<T, C, R>, "sheet" | "startColumn" | "startRow" | "sumColumn" | "rowConverter">> & {
-    column?: { sum?: boolean } & (
+    column?: { sum?: boolean; pixelSize?: number } & (
       | {
           showHeader: true;
           items: Grid<T, C, R>["columnItems"];
@@ -87,6 +88,8 @@ export class Grid<T = {}, C = string, R = string> {
 
       // column.sum is the sum of column, and we should add them as row
       if (column.sum) this.sumHeaderRow = column.sum;
+
+      if (column.pixelSize) this.columnPixelSize = column.pixelSize;
     }
 
     if (row) {
@@ -219,7 +222,7 @@ export class Grid<T = {}, C = string, R = string> {
   toGridData(args?: T): sheets_v4.Schema$GridData {
     if (args) this.generate(args);
 
-    return {
+    const data: sheets_v4.Schema$GridData = {
       startColumn: this.startColumn,
       startRow: this.startRow,
       rowData: this.getData().map((row, i) => {
@@ -244,5 +247,11 @@ export class Grid<T = {}, C = string, R = string> {
         };
       }),
     };
+
+    if (this.columnPixelSize) {
+      data.columnMetadata = this.getData().map((_) => ({ pixelSize: this.columnPixelSize }));
+    }
+
+    return data;
   }
 }
