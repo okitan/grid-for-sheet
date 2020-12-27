@@ -335,10 +335,9 @@ export class Grid<T = {}, C = string, R = string> {
       if (this.showRowHeader)
         data.columnMetadata.push(this.rowHeaderPixelSize ? { pixelSize: this.rowHeaderPixelSize } : {});
 
-      if (this.columnPixelSize)
-        data.columnMetadata.push(
-          ...Array(this.dataColumnLength).fill(this.columnPixelSize ? { pixelSize: this.columnPixelSize } : {})
-        );
+      data.columnMetadata.push(
+        ...Array(this.dataColumnLength).fill(this.columnPixelSize ? { pixelSize: this.columnPixelSize } : {})
+      );
 
       if (this.sumColumn)
         data.columnMetadata.push(this.sumHeaderRowPixelSize ? { pixelSize: this.sumHeaderRowPixelSize } : {});
