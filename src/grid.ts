@@ -25,6 +25,10 @@ export class Grid<T = {}, C = string, R = string> {
     | ((column: C | undefined, columnIndex: number) => sheets_v4.Schema$CellFormat | undefined);
 
   readonly showRowHeader: boolean = false;
+  readonly rowHeaderFormat?:
+    | sheets_v4.Schema$CellFormat
+    | sheets_v4.Schema$CellFormat[]
+    | ((row: R | undefined, rowIndex: number) => sheets_v4.Schema$CellFormat | undefined);
   readonly rowHeaderPixelSize?: number;
 
   readonly sumHeaderRow: boolean = false;
@@ -66,6 +70,7 @@ export class Grid<T = {}, C = string, R = string> {
           showHeader: true;
           items: Grid<T, C, R>["rowItems"];
           converter?: Grid<T, C, R>["rowConverter"];
+          headerFormat?: Grid<T, C, R>["rowHeaderFormat"];
           headerPixelSize?: number;
         }
       | {
@@ -100,6 +105,7 @@ export class Grid<T = {}, C = string, R = string> {
       if (row.items) this.rowItems = row.items;
       if (row.showHeader) this.showRowHeader = row.showHeader;
       if ("converter" in row) this.rowConverter = row.converter;
+      if ("headerFormat" in row) this.rowHeaderFormat = row.headerFormat;
 
       // row.sum is the sum of row, and we should add them as column
       if (row.sum) this.sumColumn = row.sum;
@@ -153,6 +159,54 @@ export class Grid<T = {}, C = string, R = string> {
 
     if (this.sumColumn) {
       data.forEach((row, i) => row.push(this.getSumColumn()[i]));
+    }
+
+    return data;
+  }
+
+  private getMetaData(): (sheets_v4.Schema$CellFormat | undefined)[][] {
+    const data = Array(this.dataRowLength).fill([...Array(this.dataColumnLength)]);
+
+    // columns first
+    // Note: do not consider rowHeader's column header
+    if (this.sumHeaderRow) {
+      data.unshift([...Array(this.dataColumnLength)]);
+    }
+
+    if (this.showColumnHeader) {
+      const columnHeaderFormat = this.showColumnHeader ? this.columnHeaderFormat : undefined;
+
+      if (!columnHeaderFormat) {
+        data.unshift([...Array(this.dataColumnLength)]);
+      } else {
+        switch (typeof columnHeaderFormat) {
+          case "object":
+            data.unshift(
+              [...Array(this.dataColumnLength)].map((_, i) =>
+                Array.isArray(columnHeaderFormat) ? columnHeaderFormat[i] : columnHeaderFormat
+              )
+            );
+            break;
+          case "function":
+            data.unshift(this.columnItems?.map(columnHeaderFormat));
+            break;
+          default:
+            const never: never = columnHeaderFormat;
+            throw never;
+        }
+      }
+    }
+
+    // rows last
+    // column header are added here
+    if (this.showRowHeader) {
+      // TODO:
+      data.forEach((row) => row.unshift(undefined));
+    }
+
+    if (this.sumColumn) {
+      // TODO:
+      data.forEach((row) => row.push(undefined));
     }
 
     return data;
@@ -228,32 +282,24 @@ export class Grid<T = {}, C = string, R = string> {
   toGridData(args?: T): sheets_v4.Schema$GridData {
     if (args) this.generate(args);
 
+    const metadata = this.getMetaData();
+
     const data: sheets_v4.Schema$GridData = {
       startColumn: this.startColumn,
       startRow: this.startRow,
       rowData: this.getData().map((row, i) => {
-        const format = this.showColumnHeader && i === 0 ? this.columnHeaderFormat : undefined;
-
         return {
           values: row.map((e, j) => {
-            const data = Cell.data(e);
+            const datum = Cell.data(e);
+            const metadatum = metadata[i][j];
 
-            const index = j - (this.showRowHeader ? 1 : 0);
-            if (!format || index < 0 || index >= this.dataColumnLength) return data;
-
-            const metadata =
-              typeof format === "object"
-                ? Array.isArray(format)
-                  ? format[index]
-                  : format
-                : format(this.columnItems && this.columnItems[index], index);
-
-            return metadata ? { ...data, userEnteredFormat: metadata } : data;
+            return metadatum ? { ...datum, userEnteredFormat: metadatum } : datum;
           }),
         };
       }),
     };
 
+    // columnMetadata
     if (this.rowHeaderPixelSize || this.columnPixelSize || this.sumHeaderRowPixelSize) {
       data.columnMetadata = [];
 
