@@ -165,7 +165,9 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   private getMetaData(): (sheets_v4.Schema$CellFormat | undefined)[][] {
-    const data = Array(this.dataRowLength).fill([...Array(this.dataColumnLength)]);
+    const data: (sheets_v4.Schema$CellFormat | undefined)[][] = Array(this.dataRowLength).fill([
+      ...Array(this.dataColumnLength),
+    ]);
 
     // columns first
     // Note: do not consider rowHeader's column header
@@ -174,7 +176,7 @@ export class Grid<T = {}, C = string, R = string> {
     }
 
     if (this.showColumnHeader) {
-      const columnHeaderFormat = this.showColumnHeader ? this.columnHeaderFormat : undefined;
+      const columnHeaderFormat = this.columnHeaderFormat;
 
       if (!columnHeaderFormat) {
         data.unshift([...Array(this.dataColumnLength)]);
@@ -188,7 +190,8 @@ export class Grid<T = {}, C = string, R = string> {
             );
             break;
           case "function":
-            data.unshift(this.columnItems?.map(columnHeaderFormat));
+            if (!this.columnItems) throw "never";
+            data.unshift(this.columnItems.map(columnHeaderFormat));
             break;
           default:
             const never: never = columnHeaderFormat;
@@ -200,8 +203,34 @@ export class Grid<T = {}, C = string, R = string> {
     // rows last
     // column header are added here
     if (this.showRowHeader) {
-      // TODO:
-      data.forEach((row) => row.unshift(undefined));
+      const rowHeaderFormat = this.rowHeaderFormat;
+
+      if (!rowHeaderFormat) {
+        data.forEach((row) => row.unshift(undefined));
+      } else {
+        switch (typeof rowHeaderFormat) {
+          case "object":
+            data.forEach((row, i) => {
+              const index = i - (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0);
+
+              row.unshift(
+                index >= 0 ? (Array.isArray(rowHeaderFormat) ? rowHeaderFormat[index] : rowHeaderFormat) : undefined
+              );
+            });
+            break;
+          case "function":
+            data.forEach((row, i) => {
+              const index = i - (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0);
+
+              row.unshift(index >= 0 ? rowHeaderFormat(this.rowItems && this.rowItems[index], index) : undefined);
+            });
+
+            break;
+          default:
+            const never: never = rowHeaderFormat;
+            throw never;
+        }
+      }
     }
 
     if (this.sumColumn) {
