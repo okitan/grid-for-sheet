@@ -165,7 +165,7 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   private getMetaData(): (sheets_v4.Schema$CellFormat | undefined)[][] {
-    const data: (sheets_v4.Schema$CellFormat | undefined)[][] = Array(this.dataRowLength).fill([
+    const data: (sheets_v4.Schema$CellFormat | undefined)[][] = [...Array(this.dataRowLength)].map((_) => [
       ...Array(this.dataColumnLength),
     ]);
 
@@ -211,7 +211,7 @@ export class Grid<T = {}, C = string, R = string> {
         switch (typeof rowHeaderFormat) {
           case "object":
             data.forEach((row, i) => {
-              const index = i - (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0);
+              const index = i - (this.showColumnHeader ? 1 : 0) - (this.sumHeaderRow ? 1 : 0);
 
               row.unshift(
                 index >= 0 ? (Array.isArray(rowHeaderFormat) ? rowHeaderFormat[index] : rowHeaderFormat) : undefined
@@ -220,7 +220,7 @@ export class Grid<T = {}, C = string, R = string> {
             break;
           case "function":
             data.forEach((row, i) => {
-              const index = i - (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0);
+              const index = i - (this.showColumnHeader ? 1 : 0) - (this.sumHeaderRow ? 1 : 0);
 
               row.unshift(index >= 0 ? rowHeaderFormat(this.rowItems && this.rowItems[index], index) : undefined);
             });

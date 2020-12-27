@@ -207,7 +207,12 @@ describe(Grid, () => {
         pixelSize: 7,
         sumPixelSize: 8,
       },
-      row: { items: ["列1", "列2"], showHeader: true, sum: true },
+      row: {
+        items: ["列1", "列2"],
+        showHeader: true,
+        sum: true,
+        headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
+      },
       dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
     });
 
@@ -287,6 +292,11 @@ describe(Grid, () => {
           Object {
             "values": Array [
               Object {
+                "userEnteredFormat": Object {
+                  "textFormat": Object {
+                    "fontSize": 1,
+                  },
+                },
                 "userEnteredValue": Object {
                   "stringValue": "列1",
                 },
@@ -311,6 +321,11 @@ describe(Grid, () => {
           Object {
             "values": Array [
               Object {
+                "userEnteredFormat": Object {
+                  "textFormat": Object {
+                    "fontSize": 2,
+                  },
+                },
                 "userEnteredValue": Object {
                   "stringValue": "列2",
                 },
