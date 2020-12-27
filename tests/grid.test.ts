@@ -200,7 +200,7 @@ describe(Grid, () => {
   test("with format returns formatted Griddata", () => {
     const grid = new Grid<{ hoge: string }>({
       column: {
-        items: ["行1", "行2"],
+        items: ["行1", "行2", "行3"],
         showHeader: true,
         sum: true,
         headerFormat: { textFormat: { bold: true } },
@@ -220,6 +220,9 @@ describe(Grid, () => {
       Object {
         "columnMetadata": Array [
           Object {},
+          Object {
+            "pixelSize": 7,
+          },
           Object {
             "pixelSize": 7,
           },
@@ -259,6 +262,16 @@ describe(Grid, () => {
                 },
               },
               Object {
+                "userEnteredFormat": Object {
+                  "textFormat": Object {
+                    "bold": true,
+                  },
+                },
+                "userEnteredValue": Object {
+                  "stringValue": "行3",
+                },
+              },
+              Object {
                 "userEnteredValue": Object {
                   "stringValue": "",
                 },
@@ -280,6 +293,11 @@ describe(Grid, () => {
               Object {
                 "userEnteredValue": Object {
                   "formulaValue": "=SUM(C3:C4)",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "formulaValue": "=SUM(D3:D4)",
                 },
               },
               Object {
@@ -313,7 +331,12 @@ describe(Grid, () => {
               },
               Object {
                 "userEnteredValue": Object {
-                  "formulaValue": "=SUM(B3:C3)",
+                  "stringValue": "fuga:行3:2/列1:0",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "formulaValue": "=SUM(B3:D3)",
                 },
               },
             ],
@@ -342,7 +365,12 @@ describe(Grid, () => {
               },
               Object {
                 "userEnteredValue": Object {
-                  "formulaValue": "=SUM(B4:C4)",
+                  "stringValue": "fuga:行3:2/列2:1",
+                },
+              },
+              Object {
+                "userEnteredValue": Object {
+                  "formulaValue": "=SUM(B4:D4)",
                 },
               },
             ],
