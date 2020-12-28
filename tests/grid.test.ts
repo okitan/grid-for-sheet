@@ -74,6 +74,8 @@ describe(Grid, () => {
 
     test("with every options", () => {
       const grid = new Grid({
+        startColumn: 1,
+        startRow: 2,
         column: { items: ["行1", "行2"], showHeader: true, sum: true },
         row: { items: ["列1", "列2"], showHeader: true, sum: true },
         data: [
@@ -84,9 +86,9 @@ describe(Grid, () => {
 
       const expected = [
         ["", "行1", "行2", ""],
-        ["計", "=SUM(B3:B4)", "=SUM(C3:C4)", ""],
-        ["列1", "文字1", 1, "=SUM(B3:C3)"],
-        ["列2", "文字2", 2, "=SUM(B4:C4)"],
+        ["計", "=SUM(C5:C6)", "=SUM(D5:D6)", ""],
+        ["列1", "文字1", 1, "=SUM(C5:D5)"],
+        ["列2", "文字2", 2, "=SUM(C6:D6)"],
       ];
 
       expect(grid.getData()).toEqual(expected);
