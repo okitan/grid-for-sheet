@@ -379,17 +379,23 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   findSumColumnCell(column: C): Cell | undefined {
-    if (!this.columnItems) return;
-
-    let index = this.columnItems.indexOf(column);
-    if (index < 0 && this.columnConverter) {
-      const converter = this.columnConverter;
-      index = this.columnItems.findIndex((e, i) => converter(e, i) === converter(column, i));
-    }
-
+    const index = this.indexColumnOf(column);
     if (index < 0) return;
 
     return this.sumColumnOrigin?.relative({ right: index });
+  }
+
+  private indexColumnOf(column: C): number {
+    if (!this.columnItems) return -1;
+
+    const index = this.columnItems.indexOf(column);
+    if (index >= 0) return index;
+
+    // use converter
+    const converter = this.columnConverter;
+    if (!converter) return index;
+
+    return this.columnItems.findIndex((e, i) => converter(e, i) === converter(column, i));
   }
 
   toRange(): string {
