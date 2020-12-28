@@ -356,18 +356,88 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   /*
-    pointer for particular data
+    pointer for particular cell
    */
   get origin(): Cell {
     return new Cell({ sheet: this.sheet, column: this.startColumn, row: this.startRow });
   }
 
-  get dataOrigin(): Cell {
-    return new Cell({
-      sheet: this.sheet,
-      column: this.startColumn + this.columnLength - this.dataColumnLength,
-      row: this.startRow + this.rowLength - this.dataRowLength,
+  get sumColumnOrigin(): Cell | undefined {
+    if (!this.sumHeaderRow) return;
+
+    return this.origin.relative({
+      right: this.showRowHeader ? 1 : 0,
+      bottom: this.showColumnHeader ? 1 : 0,
     });
+  }
+
+  get dataOrigin(): Cell {
+    return this.origin.relative({
+      right: this.showRowHeader ? 1 : 0,
+      bottom: (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0),
+    });
+  }
+
+  findSumColumnCell(column: C): Cell | undefined {
+    const index = this.indexColumnOf(column);
+    if (index < 0) return;
+
+    return this.sumColumnOrigin?.relative({ right: index });
+  }
+
+  findDataCell({ column, row }: { column?: C; row?: R }): Cell | undefined {
+    if (!this.columnItems && !this.rowItems) {
+      if (column !== undefined || row !== undefined) throw new Error("you should set neighter column nor row");
+
+      return this.dataOrigin;
+    } else if (!this.columnItems) {
+      if (column !== undefined) throw new Error("you should not set column");
+      if (row === undefined) throw new Error("you should set row");
+
+      const index = this.indexRowOf(row);
+      return index >= 0 ? this.dataOrigin.relative({ bottom: index }) : undefined;
+    } else if (!this.rowItems) {
+      if (row !== undefined) throw new Error("you should not set row");
+      if (column === undefined) throw new Error("you should set column");
+
+      const index = this.indexColumnOf(column);
+      return index >= 0 ? this.dataOrigin.relative({ right: index }) : undefined;
+    }
+
+    if (column === undefined || row === undefined) throw new Error("you should set both column and row");
+
+    const columnIndex = this.indexColumnOf(column);
+    const rowIndex = this.indexRowOf(row);
+
+    return columnIndex >= 0 && rowIndex >= 0
+      ? this.dataOrigin.relative({ right: columnIndex, bottom: rowIndex })
+      : undefined;
+  }
+
+  private indexColumnOf(column: C): number {
+    if (!this.columnItems) return -1;
+
+    const index = this.columnItems.indexOf(column);
+    if (index >= 0) return index;
+
+    // use converter
+    const converter = this.columnConverter;
+    if (!converter) return index;
+
+    return this.columnItems.findIndex((e, i) => converter(e, i) === converter(column, i));
+  }
+
+  private indexRowOf(row: R): number {
+    if (!this.rowItems) return -1;
+
+    const index = this.rowItems.indexOf(row);
+    if (index >= 0) return index;
+
+    // use converter
+    const converter = this.rowConverter;
+    if (!converter) return index;
+
+    return this.rowItems.findIndex((e, i) => converter(e, i) === converter(row, i));
   }
 
   toRange(): string {
