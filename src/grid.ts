@@ -378,13 +378,13 @@ export class Grid<T = {}, C = string, R = string> {
     });
   }
 
-  findSumColumnCell(item: C): Cell | undefined {
+  findSumColumnCell(column: C): Cell | undefined {
     if (!this.columnItems) return;
 
-    let index = this.columnItems.indexOf(item);
+    let index = this.columnItems.indexOf(column);
     if (index < 0 && this.columnConverter) {
       const converter = this.columnConverter;
-      index = this.columnItems.findIndex((e, i) => converter(e, i) === converter(item, i));
+      index = this.columnItems.findIndex((e, i) => converter(e, i) === converter(column, i));
     }
 
     if (index < 0) return;
