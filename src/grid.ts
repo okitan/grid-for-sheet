@@ -362,11 +362,34 @@ export class Grid<T = {}, C = string, R = string> {
     return new Cell({ sheet: this.sheet, column: this.startColumn, row: this.startRow });
   }
 
+  get sumColumnOrigin(): Cell | undefined {
+    if (!this.sumHeaderRow) return;
+
+    return this.origin.relative({
+      right: this.showRowHeader ? 1 : 0,
+      bottom: this.showColumnHeader ? 1 : 0,
+    });
+  }
+
   get dataOrigin(): Cell {
     return this.origin.relative({
       right: this.columnLength - this.dataColumnLength,
       bottom: this.rowLength - this.dataRowLength,
     });
+  }
+
+  findSumColumnCell(item: C): Cell | undefined {
+    if (!this.columnItems) return;
+
+    let index = this.columnItems.indexOf(item);
+    if (index < 0 && this.columnConverter) {
+      const converter = this.columnConverter;
+      index = this.columnItems.findIndex((e, i) => converter(e, i) === converter(item, i));
+    }
+
+    if (index < 0) return;
+
+    return this.sumColumnOrigin?.relative({ right: index });
   }
 
   toRange(): string {
