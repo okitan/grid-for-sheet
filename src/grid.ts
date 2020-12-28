@@ -209,7 +209,7 @@ export class Grid<T = {}, C = string, R = string> {
     sumColumn.push(
       ...[...Array(this.dataRowLength).keys()].map((i) => {
         const from = new Cell({ column: columnOffset, row: rowOffset + i });
-        const to = new Cell({ column: this.startRow + this.columnLength - 2, row: rowOffset + i });
+        const to = new Cell({ column: this.startColumn + this.columnLength - 2, row: rowOffset + i });
 
         return `=SUM(${from.toRange(to)})`;
       })
