@@ -356,17 +356,16 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   /*
-    pointer for particular data
+    pointer for particular cell
    */
   get origin(): Cell {
     return new Cell({ sheet: this.sheet, column: this.startColumn, row: this.startRow });
   }
 
   get dataOrigin(): Cell {
-    return new Cell({
-      sheet: this.sheet,
-      column: this.startColumn + this.columnLength - this.dataColumnLength,
-      row: this.startRow + this.rowLength - this.dataRowLength,
+    return this.origin.relative({
+      right: this.columnLength - this.dataColumnLength,
+      bottom: this.rowLength - this.dataRowLength,
     });
   }
 
