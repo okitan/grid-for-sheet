@@ -361,7 +361,7 @@ export class Grid<T = {}, C = string, R = string> {
         ...Array(this.dataColumnLength).fill(this.columnPixelSize ? { pixelSize: this.columnPixelSize } : {})
       );
 
-      if (this.sumColumn)
+      if (this.sumColumn || this.sumOfSum)
         data.columnMetadata.push(this.sumHeaderRowPixelSize ? { pixelSize: this.sumHeaderRowPixelSize } : {});
     }
 
