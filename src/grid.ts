@@ -53,18 +53,23 @@ export class Grid<T = {}, C = string, R = string> {
     dataGenerator,
     data,
   }: Partial<Pick<Grid<T, C, R>, "sheet" | "startColumn" | "startRow" | "sumColumn" | "rowConverter">> & {
-    column?: { pixelSize?: number; sum?: boolean; sumPixelSize?: number } & (
-      | {
-          showHeader: true;
-          items: Grid<T, C, R>["columnItems"];
-          converter?: Grid<T, C, R>["columnConverter"];
-          headerFormat?: Grid<T, C, R>["columnHeaderFormat"];
-        }
-      | {
-          showHeader?: false;
-          items?: Grid<T, C, R>["columnItems"];
-        }
-    );
+    column?: { pixelSize?: number } & (
+      | // sum
+      { sum: true; sumPixelSize?: number }
+      | { sum?: false }
+    ) &
+      (
+        | {
+            showHeader: true;
+            items: Grid<T, C, R>["columnItems"];
+            converter?: Grid<T, C, R>["columnConverter"];
+            headerFormat?: Grid<T, C, R>["columnHeaderFormat"];
+          }
+        | {
+            showHeader?: false;
+            items?: Grid<T, C, R>["columnItems"];
+          }
+      );
     row?: { sum?: boolean } & (
       | {
           showHeader: true;
@@ -96,7 +101,7 @@ export class Grid<T = {}, C = string, R = string> {
 
       // column.sum is the sum of column, and we should add them as row
       if (column.sum) this.sumHeaderRow = column.sum;
-      if (column.sumPixelSize) this.sumHeaderRowPixelSize = column.sumPixelSize;
+      if ("sumPixelSize" in column) this.sumHeaderRowPixelSize = column.sumPixelSize;
 
       if (column.pixelSize) this.columnPixelSize = column.pixelSize;
     }
