@@ -72,11 +72,33 @@ describe(Grid, () => {
       expect(grid.getData()).toEqual(expected);
     });
 
+    test("with sumOfSum but no sumRow options", () => {
+      const grid = new Grid({
+        startColumn: 1,
+        startRow: 2,
+        column: { items: ["行1", "行2"], showHeader: true, sum: true, sumOfSum: true },
+        row: { items: ["列1", "列2"], showHeader: true },
+        data: [
+          ["文字1", 1],
+          ["文字2", 2],
+        ],
+      });
+
+      const expected = [
+        ["", "行1", "行2", ""],
+        ["計", "=SUM(C5:C6)", "=SUM(D5:D6)", "=SUM(C4:D4)"],
+        ["列1", "文字1", 1, ""],
+        ["列2", "文字2", 2, ""],
+      ];
+
+      expect(grid.getData()).toEqual(expected);
+    });
+
     test("with every options", () => {
       const grid = new Grid({
         startColumn: 1,
         startRow: 2,
-        column: { items: ["行1", "行2"], showHeader: true, sum: true },
+        column: { items: ["行1", "行2"], showHeader: true, sum: true, sumOfSum: true },
         row: { items: ["列1", "列2"], showHeader: true, sum: true },
         data: [
           ["文字1", 1],
@@ -86,7 +108,7 @@ describe(Grid, () => {
 
       const expected = [
         ["", "行1", "行2", ""],
-        ["計", "=SUM(C5:C6)", "=SUM(D5:D6)", ""],
+        ["計", "=SUM(C5:C6)", "=SUM(D5:D6)", "=SUM(C4:D4)"],
         ["列1", "文字1", 1, "=SUM(C5:D5)"],
         ["列2", "文字2", 2, "=SUM(C6:D6)"],
       ];
@@ -208,6 +230,7 @@ describe(Grid, () => {
         headerFormat: { textFormat: { bold: true } },
         pixelSize: 7,
         sumPixelSize: 8,
+        sumOfSum: true,
       },
       row: {
         items: ["列1", "列2"],
@@ -304,7 +327,7 @@ describe(Grid, () => {
               },
               Object {
                 "userEnteredValue": Object {
-                  "stringValue": "",
+                  "formulaValue": "=SUM(B2:D2)",
                 },
               },
             ],
