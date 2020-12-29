@@ -419,7 +419,7 @@ describe(Grid, () => {
     });
   });
 
-  describe("#findSumColumnCell", () => {
+  describe("#findSumHeaderRowCell", () => {
     test("returns cell", () => {
       const grid = new Grid<{ hoge: string }>({
         column: {
@@ -439,7 +439,7 @@ describe(Grid, () => {
         dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
       });
 
-      expect(grid.findSumColumnCell("行2")?.notation).toEqual("C2");
+      expect(grid.findSumHeaderRowCell("行2")?.notation).toEqual("C2");
     });
   });
 

@@ -391,7 +391,7 @@ export class Grid<T = {}, C = string, R = string> {
     });
   }
 
-  findSumColumnCell(column: C): Cell | undefined {
+  findSumHeaderRowCell(column: C): Cell | undefined {
     const index = this.indexColumnOf(column);
     if (index < 0) return;
 
