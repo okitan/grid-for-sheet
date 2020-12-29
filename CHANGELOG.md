@@ -1,3 +1,10 @@
+## 1.4.0 - 2020-12-30
+
+### Changed
+
+- sumColumnOrigin returns sumColumn's origin (it formerly returns sumHeaderRow's origin)
+- added sumHeaderRowOrigin returns sumHeaderRow's origin
+
 ## 1.3.0 - 2020-12-29
 
 ### Added
