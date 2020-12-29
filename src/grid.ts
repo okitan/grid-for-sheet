@@ -208,17 +208,11 @@ export class Grid<T = {}, C = string, R = string> {
   private get sumColumnData(): string[] {
     const sumColumn: string[] = [];
 
-    const rowOffset = this.startRow + (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0);
-    const columnOffset = this.startColumn + (this.showRowHeader ? 1 : 0);
-
     if (this.showColumnHeader) sumColumn.push("");
     if (this.sumHeaderRow) {
       if (this.sumOfSum) {
-        const from = this.sumColumnOrigin;
-        if (!from) throw "something weired";
-
         // TODO: check sumColumn and sumRow is equal
-        sumColumn.push(`=SUM(${from.toRange({ right: this.dataColumnLength - 1 })})`);
+        sumColumn.push(`=SUM(${this.sumColumnOrigin?.toRange({ right: this.dataColumnLength - 1 })})`);
       } else {
         sumColumn.push("");
       }
@@ -226,12 +220,9 @@ export class Grid<T = {}, C = string, R = string> {
 
     if (this.sumColumn) {
       sumColumn.push(
-        ...[...Array(this.dataRowLength).keys()].map((i) => {
-          const from = new Cell({ column: columnOffset, row: rowOffset + i });
-          const to = new Cell({ column: this.startColumn + this.columnLength - 2, row: rowOffset + i });
-
-          return `=SUM(${from.toRange(to)})`;
-        })
+        ...[...Array(this.dataRowLength).keys()].map(
+          (i) => `=SUM(${this.dataOrigin.relative({ bottom: i }).toRange({ right: this.dataColumnLength - 1 })})`
+        )
       );
     } else {
       sumColumn.push(...Array(this.dataRowLength).fill(""));
