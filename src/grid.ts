@@ -381,6 +381,18 @@ export class Grid<T = {}, C = string, R = string> {
       : undefined;
   }
 
+  get sumColumnOirigin(): Cell | undefined {
+    return this.sumColumn
+      ? this.origin.relative({ right: this.columnLength - 1, bottom: this.rowLength - this.dataRowLength })
+      : undefined;
+  }
+
+  get sumOfSumOrigin(): Cell | undefined {
+    return this.sumOfSum
+      ? this.origin.relative({ right: this.columnLength - 1, bottom: this.showColumnHeader ? 1 : 0 })
+      : undefined;
+  }
+
   get dataOrigin(): Cell {
     return this.origin.relative({
       right: this.showRowHeader ? 1 : 0,
@@ -393,6 +405,13 @@ export class Grid<T = {}, C = string, R = string> {
     if (index < 0) return;
 
     return this.sumHeaderRowOrigin?.relative({ right: index });
+  }
+
+  findSumColumnCell(row: R): Cell | undefined {
+    const index = this.indexRowOf(row);
+    if (index < 0) return;
+
+    return this.sumColumnOirigin?.relative({ bottom: index });
   }
 
   findDataCell({ column, row }: { column?: C; row?: R }): Cell | undefined {

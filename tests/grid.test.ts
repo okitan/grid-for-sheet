@@ -443,6 +443,30 @@ describe(Grid, () => {
     });
   });
 
+  describe("#findSumColumnCell", () => {
+    test("returns cell", () => {
+      const grid = new Grid<{ hoge: string }>({
+        column: {
+          items: ["行1", "行2", "行3"],
+          showHeader: true,
+          sum: true,
+          headerFormat: { textFormat: { bold: true } },
+          pixelSize: 7,
+          sumPixelSize: 8,
+        },
+        row: {
+          items: ["列1", "列2"],
+          showHeader: true,
+          sum: true,
+          headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
+        },
+        dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
+      });
+
+      expect(grid.findSumColumnCell("列2")?.notation).toEqual("E4");
+    });
+  });
+
   describe("#findDataCell", () => {
     test("returns cell", () => {
       const grid = new Grid<{ hoge: string }>({
