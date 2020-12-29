@@ -212,7 +212,7 @@ export class Grid<T = {}, C = string, R = string> {
     if (this.sumHeaderRow) {
       if (this.sumOfSum) {
         // TODO: check sumColumn and sumRow is equal
-        sumColumn.push(`=SUM(${this.sumColumnOrigin?.toRange({ right: this.dataColumnLength - 1 })})`);
+        sumColumn.push(`=SUM(${this.sumHeaderRowOrigin?.toRange({ right: this.dataColumnLength - 1 })})`);
       } else {
         sumColumn.push("");
       }
@@ -375,13 +375,22 @@ export class Grid<T = {}, C = string, R = string> {
     return new Cell({ sheet: this.sheet, column: this.startColumn, row: this.startRow });
   }
 
-  get sumColumnOrigin(): Cell | undefined {
-    if (!this.sumHeaderRow) return;
+  get sumHeaderRowOrigin(): Cell | undefined {
+    return this.sumHeaderRow
+      ? this.origin.relative({ right: this.showRowHeader ? 1 : 0, bottom: this.showColumnHeader ? 1 : 0 })
+      : undefined;
+  }
 
-    return this.origin.relative({
-      right: this.showRowHeader ? 1 : 0,
-      bottom: this.showColumnHeader ? 1 : 0,
-    });
+  get sumColumnOirigin(): Cell | undefined {
+    return this.sumColumn
+      ? this.origin.relative({ right: this.columnLength - 1, bottom: this.rowLength - this.dataRowLength })
+      : undefined;
+  }
+
+  get sumOfSumOrigin(): Cell | undefined {
+    return this.sumOfSum
+      ? this.origin.relative({ right: this.columnLength - 1, bottom: this.showColumnHeader ? 1 : 0 })
+      : undefined;
   }
 
   get dataOrigin(): Cell {
@@ -391,11 +400,18 @@ export class Grid<T = {}, C = string, R = string> {
     });
   }
 
-  findSumColumnCell(column: C): Cell | undefined {
+  findSumHeaderRowCell(column: C): Cell | undefined {
     const index = this.indexColumnOf(column);
     if (index < 0) return;
 
-    return this.sumColumnOrigin?.relative({ right: index });
+    return this.sumHeaderRowOrigin?.relative({ right: index });
+  }
+
+  findSumColumnCell(row: R): Cell | undefined {
+    const index = this.indexRowOf(row);
+    if (index < 0) return;
+
+    return this.sumColumnOirigin?.relative({ bottom: index });
   }
 
   findDataCell({ column, row }: { column?: C; row?: R }): Cell | undefined {
