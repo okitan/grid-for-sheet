@@ -1,3 +1,13 @@
+## 1.3.0 - 2020-12-29
+
+### Added
+
+- sum of sum
+
+### Fixed
+
+- fix sum row range caluculation, in case startRow and startColumn is different
+
 ## 1.2.0 - 2020-12-28
 
 ### Added
