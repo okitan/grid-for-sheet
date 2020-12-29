@@ -376,12 +376,9 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   get sumHeaderRowOrigin(): Cell | undefined {
-    if (!this.sumHeaderRow) return;
-
-    return this.origin.relative({
-      right: this.showRowHeader ? 1 : 0,
-      bottom: this.showColumnHeader ? 1 : 0,
-    });
+    return this.sumHeaderRow
+      ? this.origin.relative({ right: this.showRowHeader ? 1 : 0, bottom: this.showColumnHeader ? 1 : 0 })
+      : undefined;
   }
 
   get dataOrigin(): Cell {
