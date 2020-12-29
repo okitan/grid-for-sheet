@@ -212,7 +212,7 @@ export class Grid<T = {}, C = string, R = string> {
     if (this.sumHeaderRow) {
       if (this.sumOfSum) {
         // TODO: check sumColumn and sumRow is equal
-        sumColumn.push(`=SUM(${this.sumColumnOrigin?.toRange({ right: this.dataColumnLength - 1 })})`);
+        sumColumn.push(`=SUM(${this.sumHeaderRowOrigin?.toRange({ right: this.dataColumnLength - 1 })})`);
       } else {
         sumColumn.push("");
       }
@@ -375,7 +375,7 @@ export class Grid<T = {}, C = string, R = string> {
     return new Cell({ sheet: this.sheet, column: this.startColumn, row: this.startRow });
   }
 
-  get sumColumnOrigin(): Cell | undefined {
+  get sumHeaderRowOrigin(): Cell | undefined {
     if (!this.sumHeaderRow) return;
 
     return this.origin.relative({
@@ -395,7 +395,7 @@ export class Grid<T = {}, C = string, R = string> {
     const index = this.indexColumnOf(column);
     if (index < 0) return;
 
-    return this.sumColumnOrigin?.relative({ right: index });
+    return this.sumHeaderRowOrigin?.relative({ right: index });
   }
 
   findDataCell({ column, row }: { column?: C; row?: R }): Cell | undefined {
