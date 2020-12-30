@@ -50,7 +50,10 @@ export class Grid<T = {}, C = string, R = string> {
     column,
     row,
     data,
-  }: Partial<Pick<Grid<T, C, R>, "sheet" | "startColumn" | "startRow">> & {
+  }: {
+    sheet?: Grid<T, C, R>["sheet"];
+    startColumn?: Grid<T, C, R>["startColumn"];
+    startRow?: Grid<T, C, R>["startRow"];
     column?: { pixelSize?: number } & (
       | // sum
       { sum: true; sumPixelSize?: number; sumOfSum?: true }
