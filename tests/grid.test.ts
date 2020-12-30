@@ -1,7 +1,7 @@
 import { Grid } from "../src";
 
 describe(Grid, () => {
-  describe("#getData", () => {
+  describe("#data", () => {
     test("returns data", () => {
       const grid = new Grid({
         column: { items: ["行1", "行2"] },
@@ -9,7 +9,7 @@ describe(Grid, () => {
         data: [["文字", 1]],
       });
 
-      expect(grid.getData()).toEqual([["文字", 1]]);
+      expect(grid.data).toEqual([["文字", 1]]);
     });
 
     test("with showColumnHeader returns included headers", () => {
@@ -19,7 +19,7 @@ describe(Grid, () => {
         data: [["文字", 1]],
       });
 
-      expect(grid.getData()).toEqual([
+      expect(grid.data).toEqual([
         ["行1", "行2"],
         ["文字", 1],
       ]);
@@ -32,7 +32,7 @@ describe(Grid, () => {
         data: [["文字", 1]],
       });
 
-      expect(grid.getData()).toEqual([["列1", "文字", 1]]);
+      expect(grid.data).toEqual([["列1", "文字", 1]]);
     });
 
     test("with showHeader both column and row returns included headers", () => {
@@ -47,10 +47,10 @@ describe(Grid, () => {
         ["列1", "文字", 1],
       ];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
 
       // check no data corruption
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
     });
 
     test("with sumColumnHeader and no showColumnHeader", () => {
@@ -69,7 +69,7 @@ describe(Grid, () => {
         ["列2", "文字2", 2],
       ];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
     });
 
     test("with sumOfSum but no sumRow options", () => {
@@ -91,7 +91,7 @@ describe(Grid, () => {
         ["列2", "文字2", 2, ""],
       ];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
     });
 
     test("with every options", () => {
@@ -113,13 +113,13 @@ describe(Grid, () => {
         ["列2", "文字2", 2, "=SUM(C6:D6)"],
       ];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
 
-      expect(grid.getData().length).toEqual(grid.rowLength);
-      expect(grid.getData()[0].length).toEqual(grid.columnLength);
+      expect(grid.data.length).toEqual(grid.rowLength);
+      expect(grid.data[0].length).toEqual(grid.columnLength);
 
       // check no data corruption
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
     });
 
     test("with dataGenerator returns generated data", () => {
@@ -138,13 +138,13 @@ describe(Grid, () => {
         ["列2", "fuga:行1:0/列2:1", "fuga:行2:1/列2:1", "=SUM(B4:C4)"],
       ];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
 
-      expect(grid.getData().length).toEqual(grid.rowLength);
-      expect(grid.getData()[0].length).toEqual(grid.columnLength);
+      expect(grid.data.length).toEqual(grid.rowLength);
+      expect(grid.data[0].length).toEqual(grid.columnLength);
 
       // check no data corruption
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
     });
 
     test("with dataGenerator and no columnItems nor rowItems generates only one data", () => {
@@ -156,10 +156,10 @@ describe(Grid, () => {
 
       const expected = [["fuga:undefined:0/undefined:0"]];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
 
-      expect(grid.getData().length).toEqual(grid.rowLength);
-      expect(grid.getData()[0].length).toEqual(grid.columnLength);
+      expect(grid.data.length).toEqual(grid.rowLength);
+      expect(grid.data[0].length).toEqual(grid.columnLength);
     });
 
     test("with generics", () => {
@@ -188,7 +188,7 @@ describe(Grid, () => {
         ["列2:1", "fuga:行1:0/列2:1", "fuga:行2:1/列2:1", "=SUM(B4:C4)"],
       ];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
     });
   });
 

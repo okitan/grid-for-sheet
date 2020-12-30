@@ -9,7 +9,7 @@ export class Grid<T = {}, C = string, R = string> {
   readonly startColumn: number = 0;
   readonly startRow: number = 0;
 
-  private data?: (string | number)[][];
+  private _data?: (string | number)[][];
   readonly dataFormat?:
     | sheets_v4.Schema$CellFormat
     | sheets_v4.Schema$CellFormat[][]
@@ -90,7 +90,7 @@ export class Grid<T = {}, C = string, R = string> {
       // for dynamic generation
       { dataGenerator: Grid<T, C, R>["dataGenerator"] },
       // for static generation
-      { data: Grid<T, C, R>["data"] }
+      { data: Grid<T, C, R>["_data"] }
     >) {
     if (sheet) this.sheet = sheet;
     if (startColumn) this.startColumn = startColumn;
@@ -122,7 +122,7 @@ export class Grid<T = {}, C = string, R = string> {
       if ("headerPixelSize" in row) this.rowHeaderPixelSize = row.headerPixelSize;
     }
 
-    if (data) this.data = data;
+    if (data) this._data = data;
     if (dataGenerator) this.dataGenerator = dataGenerator;
     if (dataFormat) this.dataFormat = dataFormat;
   }
@@ -130,20 +130,20 @@ export class Grid<T = {}, C = string, R = string> {
   /*
     data
    */
-  generate(args: T): Grid<T, C, R>["data"] {
+  generate(args: T): Grid<T, C, R>["_data"] {
     const dataGenerator = this.dataGenerator;
     if (!dataGenerator) throw new Error(`no dataGenerator set`);
 
-    return (this.data = this.rowItems.map((row, rowIndex) =>
+    return (this._data = this.rowItems.map((row, rowIndex) =>
       this.columnItems.map((column, columnIndex) => dataGenerator(column, columnIndex, row, rowIndex, args))
     ));
   }
 
-  getData(): (string | number)[][] {
-    if (!this.data) throw new Error(`no data given. set data in constructor or set dataGenerator and calculate`);
+  get data(): (string | number)[][] {
+    if (!this._data) throw new Error(`no data given. set data in constructor or set dataGenerator and calculate`);
 
     // deep copy
-    const data: (string | number)[][] = JSON.parse(JSON.stringify(this.data));
+    const data: (string | number)[][] = JSON.parse(JSON.stringify(this._data));
 
     // columns first
     // Note: do not consider rowHeader's column header
@@ -328,7 +328,7 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   private get dataColumnLength(): number {
-    return this._columnItems?.length || (this.data ? this.data[0].length : 1);
+    return this._columnItems?.length || (this._data ? this._data[0].length : 1);
   }
 
   get rowLength(): number {
@@ -336,7 +336,7 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   private get dataRowLength(): number {
-    return this._rowItems?.length || (this.data ? this.data.length : 1);
+    return this._rowItems?.length || (this._data ? this._data.length : 1);
   }
 
   get columnItems(): C[] {
@@ -351,14 +351,14 @@ export class Grid<T = {}, C = string, R = string> {
     google spreadsheet griddata convertion
    */
   toGridData(args?: T): sheets_v4.Schema$GridData {
-    if (args) this.generate(args);
+    if (args && !this._data) this.generate(args);
 
     const metadata = this.metadata;
 
     const data: sheets_v4.Schema$GridData = {
       startColumn: this.startColumn,
       startRow: this.startRow,
-      rowData: this.getData().map((row, i) => {
+      rowData: this.data.map((row, i) => {
         return {
           values: row.map((e, j) => {
             const datum = Cell.data(e);
