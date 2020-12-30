@@ -1,25 +1,25 @@
 import { Grid } from "../src";
 
 describe(Grid, () => {
-  describe("#getData", () => {
+  describe("#data", () => {
     test("returns data", () => {
       const grid = new Grid({
         column: { items: ["行1", "行2"] },
         row: { items: ["列1"] },
-        data: [["文字", 1]],
+        data: { values: [["文字", 1]] },
       });
 
-      expect(grid.getData()).toEqual([["文字", 1]]);
+      expect(grid.data).toEqual([["文字", 1]]);
     });
 
     test("with showColumnHeader returns included headers", () => {
       const grid = new Grid({
         column: { items: ["行1", "行2"], showHeader: true },
         row: { items: ["列1"] },
-        data: [["文字", 1]],
+        data: { values: [["文字", 1]] },
       });
 
-      expect(grid.getData()).toEqual([
+      expect(grid.data).toEqual([
         ["行1", "行2"],
         ["文字", 1],
       ]);
@@ -29,17 +29,17 @@ describe(Grid, () => {
       const grid = new Grid({
         column: { items: ["行1", "行2"] },
         row: { items: ["列1"], showHeader: true },
-        data: [["文字", 1]],
+        data: { values: [["文字", 1]] },
       });
 
-      expect(grid.getData()).toEqual([["列1", "文字", 1]]);
+      expect(grid.data).toEqual([["列1", "文字", 1]]);
     });
 
     test("with showHeader both column and row returns included headers", () => {
       const grid = new Grid({
         column: { items: ["行1", "行2"], showHeader: true },
         row: { items: ["列1"], showHeader: true },
-        data: [["文字", 1]],
+        data: { values: [["文字", 1]] },
       });
 
       const expected = [
@@ -47,20 +47,22 @@ describe(Grid, () => {
         ["列1", "文字", 1],
       ];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
 
       // check no data corruption
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
     });
 
     test("with sumColumnHeader and no showColumnHeader", () => {
       const grid = new Grid({
         column: { items: ["行1", "行2"], sum: true },
         row: { items: ["列1", "列2"], showHeader: true },
-        data: [
-          ["文字1", 1],
-          ["文字2", 2],
-        ],
+        data: {
+          values: [
+            ["文字1", 1],
+            ["文字2", 2],
+          ],
+        },
       });
 
       const expected = [
@@ -69,7 +71,7 @@ describe(Grid, () => {
         ["列2", "文字2", 2],
       ];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
     });
 
     test("with sumOfSum but no sumRow options", () => {
@@ -78,10 +80,12 @@ describe(Grid, () => {
         startRow: 2,
         column: { items: ["行1", "行2"], showHeader: true, sum: true, sumOfSum: true },
         row: { items: ["列1", "列2"], showHeader: true },
-        data: [
-          ["文字1", 1],
-          ["文字2", 2],
-        ],
+        data: {
+          values: [
+            ["文字1", 1],
+            ["文字2", 2],
+          ],
+        },
       });
 
       const expected = [
@@ -91,7 +95,7 @@ describe(Grid, () => {
         ["列2", "文字2", 2, ""],
       ];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
     });
 
     test("with every options", () => {
@@ -100,10 +104,12 @@ describe(Grid, () => {
         startRow: 2,
         column: { items: ["行1", "行2"], showHeader: true, sum: true, sumOfSum: true },
         row: { items: ["列1", "列2"], showHeader: true, sum: true },
-        data: [
-          ["文字1", 1],
-          ["文字2", 2],
-        ],
+        data: {
+          values: [
+            ["文字1", 1],
+            ["文字2", 2],
+          ],
+        },
       });
 
       const expected = [
@@ -113,20 +119,20 @@ describe(Grid, () => {
         ["列2", "文字2", 2, "=SUM(C6:D6)"],
       ];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
 
-      expect(grid.getData().length).toEqual(grid.rowLength);
-      expect(grid.getData()[0].length).toEqual(grid.columnLength);
+      expect(grid.data.length).toEqual(grid.rowLength);
+      expect(grid.data[0].length).toEqual(grid.columnLength);
 
       // check no data corruption
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
     });
 
     test("with dataGenerator returns generated data", () => {
       const grid = new Grid<{ hoge: string }>({
         column: { items: ["行1", "行2"], showHeader: true, sum: true },
         row: { items: ["列1", "列2"], showHeader: true, sum: true },
-        dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
+        data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
       grid.generate({ hoge: "fuga" });
@@ -138,28 +144,28 @@ describe(Grid, () => {
         ["列2", "fuga:行1:0/列2:1", "fuga:行2:1/列2:1", "=SUM(B4:C4)"],
       ];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
 
-      expect(grid.getData().length).toEqual(grid.rowLength);
-      expect(grid.getData()[0].length).toEqual(grid.columnLength);
+      expect(grid.data.length).toEqual(grid.rowLength);
+      expect(grid.data[0].length).toEqual(grid.columnLength);
 
       // check no data corruption
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
     });
 
     test("with dataGenerator and no columnItems nor rowItems generates only one data", () => {
       const grid = new Grid<{ hoge: string }>({
-        dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
+        data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
       grid.generate({ hoge: "fuga" });
 
       const expected = [["fuga:undefined:0/undefined:0"]];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
 
-      expect(grid.getData().length).toEqual(grid.rowLength);
-      expect(grid.getData()[0].length).toEqual(grid.columnLength);
+      expect(grid.data.length).toEqual(grid.rowLength);
+      expect(grid.data[0].length).toEqual(grid.columnLength);
     });
 
     test("with generics", () => {
@@ -176,7 +182,7 @@ describe(Grid, () => {
           sum: true,
           converter: (row, j) => `${row?.ugu}:${j}`,
         },
-        dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column?.fuga}:${i}/${row?.ugu}:${j}`,
+        data: { generator: (column, i, row, j, args) => `${args.hoge}:${column?.fuga}:${i}/${row?.ugu}:${j}` },
       });
 
       grid.generate({ hoge: "fuga" });
@@ -188,13 +194,18 @@ describe(Grid, () => {
         ["列2:1", "fuga:行1:0/列2:1", "fuga:行2:1/列2:1", "=SUM(B4:C4)"],
       ];
 
-      expect(grid.getData()).toEqual(expected);
+      expect(grid.data).toEqual(expected);
     });
   });
 
   describe("#girdData", () => {
     test("returns GridData", () => {
-      const grid = new Grid({ data: [["文字", 1]], dataFormat: [[{ textDirection: "1" }, { textDirection: "2" }]] });
+      const grid = new Grid({
+        data: {
+          values: [["文字", 1]],
+          format: [[{ textDirection: "1" }, { textDirection: "2" }]],
+        },
+      });
 
       expect(grid.toGridData()).toMatchInlineSnapshot(`
         Object {
@@ -244,8 +255,10 @@ describe(Grid, () => {
         sum: true,
         headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
       },
-      dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
-      dataFormat: (column, i, row, j) => ({ textDirection: `${column}:${i}/${row}:${j}` }),
+      data: {
+        generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
+        format: (column, i, row, j) => ({ textDirection: `${column}:${i}/${row}:${j}` }),
+      },
     });
 
     expect(grid.toGridData({ hoge: "fuga" })).toMatchInlineSnapshot(`
@@ -437,7 +450,7 @@ describe(Grid, () => {
       const grid = new Grid<{ hoge: string }>({
         column: { items: ["行1", "行2"], showHeader: true, sum: true },
         row: { items: ["列1", "列2"], showHeader: true, sum: true },
-        dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
+        data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
       expect(grid.toRange()).toEqual("A1:D4");
@@ -461,7 +474,7 @@ describe(Grid, () => {
           sum: true,
           headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
         },
-        dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
+        data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
       expect(grid.findSumHeaderRowCell("行2")?.notation).toEqual("C2");
@@ -485,7 +498,7 @@ describe(Grid, () => {
           sum: true,
           headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
         },
-        dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
+        data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
       expect(grid.findSumColumnCell("列2")?.notation).toEqual("E4");
@@ -509,7 +522,7 @@ describe(Grid, () => {
           sum: true,
           headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
         },
-        dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
+        data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
       expect(grid.findDataCell({ column: "行3", row: "列1" })?.notation).toEqual("D3");
