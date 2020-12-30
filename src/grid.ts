@@ -10,25 +10,29 @@ export class Grid<T = {}, C = string, R = string> {
   readonly startRow: number = 0;
 
   private data?: (string | number)[][];
+  readonly dataFormat?:
+    | sheets_v4.Schema$CellFormat
+    | sheets_v4.Schema$CellFormat[][]
+    | ((column: C, columnIndex: number, row: R, rowIndex: number) => sheets_v4.Schema$CellFormat | undefined);
 
-  readonly columnItems?: C[];
+  private readonly _columnItems?: C[];
   readonly columnConverter?: (column: C, columnIndex: number) => string | number;
   readonly columnPixelSize?: number;
 
-  readonly rowItems?: R[];
+  private readonly _rowItems?: R[];
   readonly rowConverter?: (row: R, columnIndex: number) => string | number;
 
   readonly showColumnHeader: boolean = false;
   readonly columnHeaderFormat?:
     | sheets_v4.Schema$CellFormat
     | sheets_v4.Schema$CellFormat[]
-    | ((column: C | undefined, columnIndex: number) => sheets_v4.Schema$CellFormat | undefined);
+    | ((column: C, columnIndex: number) => sheets_v4.Schema$CellFormat | undefined);
 
   readonly showRowHeader: boolean = false;
   readonly rowHeaderFormat?:
     | sheets_v4.Schema$CellFormat
     | sheets_v4.Schema$CellFormat[]
-    | ((row: R | undefined, rowIndex: number) => sheets_v4.Schema$CellFormat | undefined);
+    | ((row: R, rowIndex: number) => sheets_v4.Schema$CellFormat | undefined);
   readonly rowHeaderPixelSize?: number;
 
   readonly sumHeaderRow: boolean = false;
@@ -38,13 +42,7 @@ export class Grid<T = {}, C = string, R = string> {
   readonly sumColumn: boolean = false;
 
   // dynamic
-  readonly dataGenerator?: (
-    column: C | undefined,
-    columnIndex: number,
-    row: R | undefined,
-    rowIndex: number,
-    args: T
-  ) => string | number;
+  readonly dataGenerator?: (column: C, columnIndex: number, row: R, rowIndex: number, args: T) => string | number;
 
   constructor({
     sheet,
@@ -52,9 +50,12 @@ export class Grid<T = {}, C = string, R = string> {
     startRow,
     column,
     row,
-    dataGenerator,
     data,
-  }: Partial<Pick<Grid<T, C, R>, "sheet" | "startColumn" | "startRow" | "sumColumn" | "rowConverter">> & {
+    dataGenerator,
+    dataFormat,
+  }: Partial<
+    Pick<Grid<T, C, R>, "sheet" | "startColumn" | "startRow" | "dataFormat" | "sumColumn" | "rowConverter">
+  > & {
     column?: { pixelSize?: number } & (
       | // sum
       { sum: true; sumPixelSize?: number; sumOfSum?: true }
@@ -63,26 +64,26 @@ export class Grid<T = {}, C = string, R = string> {
       (
         | {
             showHeader: true;
-            items: Grid<T, C, R>["columnItems"];
+            items: Grid<T, C, R>["_columnItems"];
             converter?: Grid<T, C, R>["columnConverter"];
             headerFormat?: Grid<T, C, R>["columnHeaderFormat"];
           }
         | {
             showHeader?: false;
-            items?: Grid<T, C, R>["columnItems"];
+            items?: Grid<T, C, R>["_columnItems"];
           }
       );
     row?: { sum?: boolean } & (
       | {
           showHeader: true;
-          items: Grid<T, C, R>["rowItems"];
+          items: Grid<T, C, R>["_rowItems"];
           converter?: Grid<T, C, R>["rowConverter"];
           headerFormat?: Grid<T, C, R>["rowHeaderFormat"];
           headerPixelSize?: number;
         }
       | {
           showHeader?: false;
-          items?: Grid<T, C, R>["rowItems"];
+          items?: Grid<T, C, R>["_rowItems"];
         }
     );
   } & XOR<
@@ -96,7 +97,7 @@ export class Grid<T = {}, C = string, R = string> {
     if (startRow) this.startRow = startRow;
 
     if (column) {
-      if (column.items) this.columnItems = column.items;
+      if (column.items) this._columnItems = column.items;
       if (column.showHeader) this.showColumnHeader = column.showHeader;
       if ("converter" in column) this.columnConverter = column.converter;
       if ("headerFormat" in column) this.columnHeaderFormat = column.headerFormat;
@@ -110,7 +111,7 @@ export class Grid<T = {}, C = string, R = string> {
     }
 
     if (row) {
-      if (row.items) this.rowItems = row.items;
+      if (row.items) this._rowItems = row.items;
       if (row.showHeader) this.showRowHeader = row.showHeader;
       if ("converter" in row) this.rowConverter = row.converter;
       if ("headerFormat" in row) this.rowHeaderFormat = row.headerFormat;
@@ -121,8 +122,9 @@ export class Grid<T = {}, C = string, R = string> {
       if ("headerPixelSize" in row) this.rowHeaderPixelSize = row.headerPixelSize;
     }
 
-    if (dataGenerator) this.dataGenerator = dataGenerator;
     if (data) this.data = data;
+    if (dataGenerator) this.dataGenerator = dataGenerator;
+    if (dataFormat) this.dataFormat = dataFormat;
   }
 
   /*
@@ -132,11 +134,8 @@ export class Grid<T = {}, C = string, R = string> {
     const dataGenerator = this.dataGenerator;
     if (!dataGenerator) throw new Error(`no dataGenerator set`);
 
-    const columnItems = this.columnItems || [...Array<C>(1)];
-    const rowItems = this.rowItems || [...Array<R>(1)];
-
-    return (this.data = rowItems.map((row, rowIndex) =>
-      columnItems.map((column, columnIndex) => dataGenerator(column, columnIndex, row, rowIndex, args))
+    return (this.data = this.rowItems.map((row, rowIndex) =>
+      this.columnItems.map((column, columnIndex) => dataGenerator(column, columnIndex, row, rowIndex, args))
     ));
   }
 
@@ -151,11 +150,11 @@ export class Grid<T = {}, C = string, R = string> {
     if (this.sumHeaderRow) data.unshift(this.sumHeaderRowData);
 
     if (this.showColumnHeader) {
-      if (!this.columnItems) throw new Error("showColumnHeader requries columnItems");
+      if (!this._columnItems) throw new Error("showColumnHeader requries columnItems");
 
       const converter = this.columnConverter;
       // @ts-ignore for most case this.columnItems are string[]
-      const columnItems: (string | number)[] = converter ? this.columnItems.map(converter) : this.columnItems;
+      const columnItems: (string | number)[] = converter ? this._columnItems.map(converter) : this._columnItems;
 
       data.unshift([...columnItems]);
     }
@@ -163,7 +162,7 @@ export class Grid<T = {}, C = string, R = string> {
     // rows last
     // column header are added here
     if (this.showRowHeader) {
-      if (!this.rowItems) throw new Error("showRowHeader requries rowItems");
+      if (!this._rowItems) throw new Error("showRowHeader requries rowItems");
 
       data.forEach((row, i) => row.unshift(this.rowItemsData[i]));
     }
@@ -183,10 +182,10 @@ export class Grid<T = {}, C = string, R = string> {
 
     const converter = this.rowConverter;
     rowItems.push(
-      ...(this.rowItems
+      ...(this._rowItems
         ? converter
-          ? this.rowItems.map(converter)
-          : this.rowItems // XXX
+          ? this._rowItems.map(converter)
+          : this._rowItems // XXX
         : Array(this.dataRowLength).fill(""))
     );
 
@@ -232,9 +231,22 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   private get metadata(): (sheets_v4.Schema$CellFormat | undefined)[][] {
-    const data: (sheets_v4.Schema$CellFormat | undefined)[][] = [...Array(this.dataRowLength)].map((_) => [
-      ...Array(this.dataColumnLength),
-    ]);
+    const format = this.dataFormat;
+    const data = this.rowItems.map((row, rowIndex) =>
+      this.columnItems.map((column, columnIndex) => {
+        switch (typeof format) {
+          case "object":
+            return Array.isArray(format) ? format[rowIndex][columnIndex] : format;
+          case "function":
+            return format(column, columnIndex, row, rowIndex);
+          case "undefined":
+            return;
+          default:
+            const never: never = format;
+            throw never;
+        }
+      })
+    );
 
     // columns first
     // Note: do not consider rowHeader's column header
@@ -257,7 +269,7 @@ export class Grid<T = {}, C = string, R = string> {
             );
             break;
           case "function":
-            if (!this.columnItems) throw "never";
+            if (!this._columnItems) throw "never";
             data.unshift(this.columnItems.map(columnHeaderFormat));
             break;
           default:
@@ -289,7 +301,7 @@ export class Grid<T = {}, C = string, R = string> {
             data.forEach((row, i) => {
               const index = i - (this.showColumnHeader ? 1 : 0) - (this.sumHeaderRow ? 1 : 0);
 
-              row.unshift(index >= 0 ? rowHeaderFormat(this.rowItems && this.rowItems[index], index) : undefined);
+              row.unshift(index >= 0 ? rowHeaderFormat(this.rowItems[index], index) : undefined);
             });
 
             break;
@@ -316,7 +328,7 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   private get dataColumnLength(): number {
-    return this.columnItems?.length || (this.data ? this.data[0].length : 1);
+    return this._columnItems?.length || (this.data ? this.data[0].length : 1);
   }
 
   get rowLength(): number {
@@ -324,7 +336,15 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   private get dataRowLength(): number {
-    return this.rowItems?.length || (this.data ? this.data.length : 1);
+    return this._rowItems?.length || (this.data ? this.data.length : 1);
+  }
+
+  get columnItems(): C[] {
+    return this._columnItems || [...Array<C>(this.dataColumnLength)];
+  }
+
+  get rowItems(): R[] {
+    return this._rowItems || [...Array<R>(this.dataRowLength)];
   }
 
   /*
@@ -415,17 +435,17 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   findDataCell({ column, row }: { column?: C; row?: R }): Cell | undefined {
-    if (!this.columnItems && !this.rowItems) {
+    if (!this._columnItems && !this._rowItems) {
       if (column !== undefined || row !== undefined) throw new Error("you should set neighter column nor row");
 
       return this.dataOrigin;
-    } else if (!this.columnItems) {
+    } else if (!this._columnItems) {
       if (column !== undefined) throw new Error("you should not set column");
       if (row === undefined) throw new Error("you should set row");
 
       const index = this.indexRowOf(row);
       return index >= 0 ? this.dataOrigin.relative({ bottom: index }) : undefined;
-    } else if (!this.rowItems) {
+    } else if (!this._rowItems) {
       if (row !== undefined) throw new Error("you should not set row");
       if (column === undefined) throw new Error("you should set column");
 
@@ -444,29 +464,29 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   private indexColumnOf(column: C): number {
-    if (!this.columnItems) return -1;
+    if (!this._columnItems) return -1;
 
-    const index = this.columnItems.indexOf(column);
+    const index = this._columnItems.indexOf(column);
     if (index >= 0) return index;
 
     // use converter
     const converter = this.columnConverter;
     if (!converter) return index;
 
-    return this.columnItems.findIndex((e, i) => converter(e, i) === converter(column, i));
+    return this._columnItems.findIndex((e, i) => converter(e, i) === converter(column, i));
   }
 
   private indexRowOf(row: R): number {
-    if (!this.rowItems) return -1;
+    if (!this._rowItems) return -1;
 
-    const index = this.rowItems.indexOf(row);
+    const index = this._rowItems.indexOf(row);
     if (index >= 0) return index;
 
     // use converter
     const converter = this.rowConverter;
     if (!converter) return index;
 
-    return this.rowItems.findIndex((e, i) => converter(e, i) === converter(row, i));
+    return this._rowItems.findIndex((e, i) => converter(e, i) === converter(row, i));
   }
 
   toRange(): string {
