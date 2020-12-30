@@ -12,25 +12,27 @@ export type GridConstructor<T, C, R> = {
     | { sum?: false }
   ) &
     (
-      | {
+      | ({
           showHeader: true;
           items: Grid<T, C, R>["_columnItems"];
-          converter?: Grid<T, C, R>["columnConverter"];
           headerFormat?: Grid<T, C, R>["columnHeaderFormat"];
-        }
+        } & (Exclude<C, string | number> extends never
+          ? { converter?: Grid<T, C, R>["columnConverter"] }
+          : { converter: Grid<T, C, R>["columnConverter"] }))
       | {
           showHeader?: false;
           items?: Grid<T, C, R>["_columnItems"];
         }
     );
   row?: { sum?: boolean } & (
-    | {
+    | ({
         showHeader: true;
         items: Grid<T, C, R>["_rowItems"];
-        converter?: Grid<T, C, R>["rowConverter"];
         headerFormat?: Grid<T, C, R>["rowHeaderFormat"];
         headerPixelSize?: number;
-      }
+      } & (Exclude<R, string | number> extends never
+        ? { converter?: Grid<T, C, R>["rowConverter"] }
+        : { converter: Grid<T, C, R>["rowConverter"] }))
     | {
         showHeader?: false;
         items?: Grid<T, C, R>["_rowItems"];
