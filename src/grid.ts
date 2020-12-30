@@ -13,12 +13,7 @@ export class Grid<T = {}, C = string, R = string> {
   readonly dataFormat?:
     | sheets_v4.Schema$CellFormat
     | sheets_v4.Schema$CellFormat[][]
-    | ((
-        column: C | undefined,
-        columnIndex: number,
-        row: R | undefined,
-        rowIndex: number
-      ) => sheets_v4.Schema$CellFormat | undefined);
+    | ((column: C, columnIndex: number, row: R, rowIndex: number) => sheets_v4.Schema$CellFormat | undefined);
 
   private readonly _columnItems?: C[];
   readonly columnConverter?: (column: C, columnIndex: number) => string | number;
@@ -31,13 +26,13 @@ export class Grid<T = {}, C = string, R = string> {
   readonly columnHeaderFormat?:
     | sheets_v4.Schema$CellFormat
     | sheets_v4.Schema$CellFormat[]
-    | ((column: C | undefined, columnIndex: number) => sheets_v4.Schema$CellFormat | undefined);
+    | ((column: C, columnIndex: number) => sheets_v4.Schema$CellFormat | undefined);
 
   readonly showRowHeader: boolean = false;
   readonly rowHeaderFormat?:
     | sheets_v4.Schema$CellFormat
     | sheets_v4.Schema$CellFormat[]
-    | ((row: R | undefined, rowIndex: number) => sheets_v4.Schema$CellFormat | undefined);
+    | ((row: R, rowIndex: number) => sheets_v4.Schema$CellFormat | undefined);
   readonly rowHeaderPixelSize?: number;
 
   readonly sumHeaderRow: boolean = false;
@@ -47,13 +42,7 @@ export class Grid<T = {}, C = string, R = string> {
   readonly sumColumn: boolean = false;
 
   // dynamic
-  readonly dataGenerator?: (
-    column: C | undefined,
-    columnIndex: number,
-    row: R | undefined,
-    rowIndex: number,
-    args: T
-  ) => string | number;
+  readonly dataGenerator?: (column: C, columnIndex: number, row: R, rowIndex: number, args: T) => string | number;
 
   constructor({
     sheet,
