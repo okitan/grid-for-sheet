@@ -2,6 +2,50 @@ import { sheets_v4 } from "googleapis";
 
 import { Cell } from "./cell";
 
+export type GridConstructor<T, C, R> = {
+  sheet?: Grid<T, C, R>["sheet"];
+  startColumn?: Grid<T, C, R>["startColumn"];
+  startRow?: Grid<T, C, R>["startRow"];
+  column?: { pixelSize?: number } & (
+    | // sum
+    { sum: true; sumPixelSize?: number; sumOfSum?: true }
+    | { sum?: false }
+  ) &
+    (
+      | {
+          showHeader: true;
+          items: Grid<T, C, R>["_columnItems"];
+          converter?: Grid<T, C, R>["columnConverter"];
+          headerFormat?: Grid<T, C, R>["columnHeaderFormat"];
+        }
+      | {
+          showHeader?: false;
+          items?: Grid<T, C, R>["_columnItems"];
+        }
+    );
+  row?: { sum?: boolean } & (
+    | {
+        showHeader: true;
+        items: Grid<T, C, R>["_rowItems"];
+        converter?: Grid<T, C, R>["rowConverter"];
+        headerFormat?: Grid<T, C, R>["rowHeaderFormat"];
+        headerPixelSize?: number;
+      }
+    | {
+        showHeader?: false;
+        items?: Grid<T, C, R>["_rowItems"];
+      }
+  );
+  data: { format?: Grid<T, C, R>["dataFormat"] } & (
+    | {
+        values: (string | number)[][];
+      }
+    | {
+        generator: Grid<T, C, R>["dataGenerator"];
+      }
+  );
+};
+
 export class Grid<T = {}, C = string, R = string> {
   readonly sheet?: string;
 
@@ -43,56 +87,7 @@ export class Grid<T = {}, C = string, R = string> {
   // dynamic
   readonly dataGenerator?: (column: C, columnIndex: number, row: R, rowIndex: number, args: T) => string | number;
 
-  constructor({
-    sheet,
-    startColumn,
-    startRow,
-    column,
-    row,
-    data,
-  }: {
-    sheet?: Grid<T, C, R>["sheet"];
-    startColumn?: Grid<T, C, R>["startColumn"];
-    startRow?: Grid<T, C, R>["startRow"];
-    column?: { pixelSize?: number } & (
-      | // sum
-      { sum: true; sumPixelSize?: number; sumOfSum?: true }
-      | { sum?: false }
-    ) &
-      (
-        | {
-            showHeader: true;
-            items: Grid<T, C, R>["_columnItems"];
-            converter?: Grid<T, C, R>["columnConverter"];
-            headerFormat?: Grid<T, C, R>["columnHeaderFormat"];
-          }
-        | {
-            showHeader?: false;
-            items?: Grid<T, C, R>["_columnItems"];
-          }
-      );
-    row?: { sum?: boolean } & (
-      | {
-          showHeader: true;
-          items: Grid<T, C, R>["_rowItems"];
-          converter?: Grid<T, C, R>["rowConverter"];
-          headerFormat?: Grid<T, C, R>["rowHeaderFormat"];
-          headerPixelSize?: number;
-        }
-      | {
-          showHeader?: false;
-          items?: Grid<T, C, R>["_rowItems"];
-        }
-    );
-    data: { format?: Grid<T, C, R>["dataFormat"] } & (
-      | {
-          values: (string | number)[][];
-        }
-      | {
-          generator: Grid<T, C, R>["dataGenerator"];
-        }
-    );
-  }) {
+  constructor({ sheet, startColumn, startRow, column, row, data }: GridConstructor<T, C, R>) {
     if (sheet) this.sheet = sheet;
     if (startColumn) this.startColumn = startColumn;
     if (startRow) this.startRow = startRow;
