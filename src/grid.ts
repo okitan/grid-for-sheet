@@ -232,13 +232,13 @@ export class Grid<T = {}, C = string, R = string> {
 
   private get metadata(): (sheets_v4.Schema$CellFormat | undefined)[][] {
     const format = this.dataFormat;
-    const data = this.rowItems.map((row: R | undefined, i: number) =>
-      this.columnItems.map((column, j) => {
+    const data = this.rowItems.map((row, rowIndex) =>
+      this.columnItems.map((column, columnIndex) => {
         switch (typeof format) {
           case "object":
-            return Array.isArray(format) ? format[i][j] : format;
+            return Array.isArray(format) ? format[rowIndex][columnIndex] : format;
           case "function":
-            return format(column, j, row, i);
+            return format(column, columnIndex, row, rowIndex);
           case "undefined":
             return;
           default:
@@ -270,7 +270,7 @@ export class Grid<T = {}, C = string, R = string> {
             break;
           case "function":
             if (!this._columnItems) throw "never";
-            data.unshift(this._columnItems.map(columnHeaderFormat));
+            data.unshift(this.columnItems.map(columnHeaderFormat));
             break;
           default:
             const never: never = columnHeaderFormat;
@@ -301,7 +301,7 @@ export class Grid<T = {}, C = string, R = string> {
             data.forEach((row, i) => {
               const index = i - (this.showColumnHeader ? 1 : 0) - (this.sumHeaderRow ? 1 : 0);
 
-              row.unshift(index >= 0 ? rowHeaderFormat(this._rowItems && this._rowItems[index], index) : undefined);
+              row.unshift(index >= 0 ? rowHeaderFormat(this.rowItems[index], index) : undefined);
             });
 
             break;
