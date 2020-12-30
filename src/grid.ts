@@ -10,6 +10,15 @@ export class Grid<T = {}, C = string, R = string> {
   readonly startRow: number = 0;
 
   private data?: (string | number)[][];
+  readonly dataFormat?:
+    | sheets_v4.Schema$CellFormat
+    | sheets_v4.Schema$CellFormat[][]
+    | ((
+        column: C | undefined,
+        columnIndex: number,
+        row: R | undefined,
+        rowIndex: number
+      ) => sheets_v4.Schema$CellFormat | undefined);
 
   readonly columnItems?: C[];
   readonly columnConverter?: (column: C, columnIndex: number) => string | number;
@@ -52,9 +61,12 @@ export class Grid<T = {}, C = string, R = string> {
     startRow,
     column,
     row,
-    dataGenerator,
     data,
-  }: Partial<Pick<Grid<T, C, R>, "sheet" | "startColumn" | "startRow" | "sumColumn" | "rowConverter">> & {
+    dataGenerator,
+    dataFormat,
+  }: Partial<
+    Pick<Grid<T, C, R>, "sheet" | "startColumn" | "startRow" | "dataFormat" | "sumColumn" | "rowConverter">
+  > & {
     column?: { pixelSize?: number } & (
       | // sum
       { sum: true; sumPixelSize?: number; sumOfSum?: true }
@@ -121,8 +133,9 @@ export class Grid<T = {}, C = string, R = string> {
       if ("headerPixelSize" in row) this.rowHeaderPixelSize = row.headerPixelSize;
     }
 
-    if (dataGenerator) this.dataGenerator = dataGenerator;
     if (data) this.data = data;
+    if (dataGenerator) this.dataGenerator = dataGenerator;
+    if (dataFormat) this.dataFormat = dataFormat;
   }
 
   /*
@@ -232,9 +245,23 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   private get metadata(): (sheets_v4.Schema$CellFormat | undefined)[][] {
-    const data: (sheets_v4.Schema$CellFormat | undefined)[][] = [...Array(this.dataRowLength)].map((_) => [
-      ...Array(this.dataColumnLength),
-    ]);
+    const format = this.dataFormat;
+    const data = ((this.rowItems || [...Array(this.dataRowLength)]) as (R | undefined)[]).map(
+      (row: R | undefined, i: number) =>
+        ((this.columnItems || [...Array(this.dataColumnLength)]) as (C | undefined)[]).map((column, j) => {
+          switch (typeof format) {
+            case "object":
+              return Array.isArray(format) ? format[i][j] : format;
+            case "function":
+              return format(column, j, row, i);
+            case "undefined":
+              return;
+            default:
+              const never: never = format;
+              throw never;
+          }
+        })
+    );
 
     // columns first
     // Note: do not consider rowHeader's column header

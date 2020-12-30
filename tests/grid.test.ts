@@ -194,7 +194,7 @@ describe(Grid, () => {
 
   describe("#girdData", () => {
     test("returns GridData", () => {
-      const grid = new Grid({ data: [["文字", 1]] });
+      const grid = new Grid({ data: [["文字", 1]], dataFormat: [[{ textDirection: "1" }, { textDirection: "2" }]] });
 
       expect(grid.toGridData()).toMatchInlineSnapshot(`
         Object {
@@ -202,11 +202,17 @@ describe(Grid, () => {
             Object {
               "values": Array [
                 Object {
+                  "userEnteredFormat": Object {
+                    "textDirection": "1",
+                  },
                   "userEnteredValue": Object {
                     "stringValue": "文字",
                   },
                 },
                 Object {
+                  "userEnteredFormat": Object {
+                    "textDirection": "2",
+                  },
                   "userEnteredValue": Object {
                     "numberValue": 1,
                   },
@@ -239,6 +245,7 @@ describe(Grid, () => {
         headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
       },
       dataGenerator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
+      dataFormat: (column, i, row, j) => ({ textDirection: `${column}:${i}/${row}:${j}` }),
     });
 
     expect(grid.toGridData({ hoge: "fuga" })).toMatchInlineSnapshot(`
@@ -345,16 +352,25 @@ describe(Grid, () => {
                 },
               },
               Object {
+                "userEnteredFormat": Object {
+                  "textDirection": "行1:0/列1:0",
+                },
                 "userEnteredValue": Object {
                   "stringValue": "fuga:行1:0/列1:0",
                 },
               },
               Object {
+                "userEnteredFormat": Object {
+                  "textDirection": "行2:1/列1:0",
+                },
                 "userEnteredValue": Object {
                   "stringValue": "fuga:行2:1/列1:0",
                 },
               },
               Object {
+                "userEnteredFormat": Object {
+                  "textDirection": "行3:2/列1:0",
+                },
                 "userEnteredValue": Object {
                   "stringValue": "fuga:行3:2/列1:0",
                 },
@@ -379,16 +395,25 @@ describe(Grid, () => {
                 },
               },
               Object {
+                "userEnteredFormat": Object {
+                  "textDirection": "行1:0/列2:1",
+                },
                 "userEnteredValue": Object {
                   "stringValue": "fuga:行1:0/列2:1",
                 },
               },
               Object {
+                "userEnteredFormat": Object {
+                  "textDirection": "行2:1/列2:1",
+                },
                 "userEnteredValue": Object {
                   "stringValue": "fuga:行2:1/列2:1",
                 },
               },
               Object {
+                "userEnteredFormat": Object {
+                  "textDirection": "行3:2/列2:1",
+                },
                 "userEnteredValue": Object {
                   "stringValue": "fuga:行3:2/列2:1",
                 },
