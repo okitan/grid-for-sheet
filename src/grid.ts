@@ -140,7 +140,7 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   get data(): (string | number)[][] {
-    if (!this._data) throw new Error(`no data given. set data in constructor or set dataGenerator and calculate`);
+    if (!this._data) throw new Error(`no data given. set data in constructor or set dataGenerator and generate`);
 
     // deep copy
     const data: (string | number)[][] = JSON.parse(JSON.stringify(this._data));
