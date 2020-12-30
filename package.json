@@ -28,7 +28,6 @@
   },
   "typings": "./lib/index.d.ts",
   "dependencies": {
-    "googleapis": "^66.0.0",
-    "ts-xor": "^1.0.8"
+    "googleapis": "^66.0.0"
   }
 }

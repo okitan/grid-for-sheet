@@ -1,5 +1,4 @@
 import { sheets_v4 } from "googleapis";
-import { XOR } from "ts-xor";
 
 import { Cell } from "./cell";
 
@@ -51,11 +50,7 @@ export class Grid<T = {}, C = string, R = string> {
     column,
     row,
     data,
-    dataGenerator,
-    dataFormat,
-  }: Partial<
-    Pick<Grid<T, C, R>, "sheet" | "startColumn" | "startRow" | "dataFormat" | "sumColumn" | "rowConverter">
-  > & {
+  }: Partial<Pick<Grid<T, C, R>, "sheet" | "startColumn" | "startRow" | "sumColumn">> & {
     column?: { pixelSize?: number } & (
       | // sum
       { sum: true; sumPixelSize?: number; sumOfSum?: true }
@@ -86,12 +81,15 @@ export class Grid<T = {}, C = string, R = string> {
           items?: Grid<T, C, R>["_rowItems"];
         }
     );
-  } & XOR<
-      // for dynamic generation
-      { dataGenerator: Grid<T, C, R>["dataGenerator"] },
-      // for static generation
-      { data: Grid<T, C, R>["_data"] }
-    >) {
+    data: { format?: Grid<T, C, R>["dataFormat"] } & (
+      | {
+          values: (string | number)[][];
+        }
+      | {
+          generator: Grid<T, C, R>["dataGenerator"];
+        }
+    );
+  }) {
     if (sheet) this.sheet = sheet;
     if (startColumn) this.startColumn = startColumn;
     if (startRow) this.startRow = startRow;
@@ -122,9 +120,9 @@ export class Grid<T = {}, C = string, R = string> {
       if ("headerPixelSize" in row) this.rowHeaderPixelSize = row.headerPixelSize;
     }
 
-    if (data) this._data = data;
-    if (dataGenerator) this.dataGenerator = dataGenerator;
-    if (dataFormat) this.dataFormat = dataFormat;
+    if ("values" in data) this._data = data.values;
+    if ("generator" in data) this.dataGenerator = data.generator;
+    if (data.format) this.dataFormat = data.format;
   }
 
   /*
