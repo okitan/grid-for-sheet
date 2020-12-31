@@ -6,6 +6,7 @@ export type GridConstructor<T, C, R> = {
   sheet?: string;
   startColumn?: number;
   startRow?: number;
+  label?: string; // only shown when both headerRow and headerColumn are present
   column?: { pixelSize?: number } & (
     | ({
         showHeader: true;
@@ -33,26 +34,15 @@ export type GridConstructor<T, C, R> = {
         items?: Grid<T, C, R>["_rowItems"];
       };
   sum?: {
+    column?: {
+      label?: string;
+      pixelSize?: number;
+    };
     row?: {
       label?: string; // only shown when headerRow is present
       pixelSize?: number;
     };
-  } & (
-    | {
-        total?: true;
-        column: {
-          label?: string; // only shown when headerColumn is present
-          pixelSize?: number;
-        };
-      }
-    | {
-        total?: false;
-        column?: {
-          label?: string;
-          pixelSize: number;
-        };
-      }
-  );
+  };
   data: { format?: Grid<T, C, R>["dataFormat"] } & (
     | {
         values: (string | number)[][];
@@ -68,6 +58,8 @@ export class Grid<T = {}, C = string, R = string> {
 
   readonly startColumn: number = 0;
   readonly startRow: number = 0;
+
+  readonly gridLabel: string = "";
 
   private _data?: (string | number)[][];
   readonly dataFormat?:
@@ -96,18 +88,21 @@ export class Grid<T = {}, C = string, R = string> {
   readonly rowHeaderPixelSize?: number;
 
   readonly sumHeaderRow: boolean = false;
+  readonly sumHeaderRowLabel: string = "SUM";
   readonly sumHeaderRowPixelSize?: number;
   readonly sumOfSum: boolean = false;
 
   readonly sumColumn: boolean = false;
+  readonly sumColumnLabel: string = "SUM";
 
   // dynamic
   readonly dataGenerator?: (column: C, columnIndex: number, row: R, rowIndex: number, args: T) => string | number;
 
-  constructor({ sheet, startColumn, startRow, column, row, sum, data }: GridConstructor<T, C, R>) {
+  constructor({ sheet, startColumn, startRow, label, column, row, sum, data }: GridConstructor<T, C, R>) {
     if (sheet) this.sheet = sheet;
     if (startColumn) this.startColumn = startColumn;
     if (startRow) this.startRow = startRow;
+    if (label) this.gridLabel = label;
 
     if (column) {
       if (column.items) this._columnItems = column.items;
@@ -132,16 +127,16 @@ export class Grid<T = {}, C = string, R = string> {
         // column.sum is the sum of column, and we should add them as row
         this.sumHeaderRow = true;
         if (sum.column.pixelSize) this.sumHeaderRowPixelSize = sum.column.pixelSize;
-        // if (sum.column.label) // TODO:
+        if (sum.column.label) this.sumHeaderRowLabel = sum.column.label;
       }
       if (sum.row) {
         // row.sum is the sum of row, and we should add them as column
         this.sumColumn = true;
+        if (sum.row.label) this.sumColumnLabel = sum.row.label;
         // if (sum.row.pixelSize) this.sumColumnPixelSize = sum.row.pixelSize;
       }
-      if (sum.total) {
-        this.sumOfSum = true;
-      }
+
+      this.sumOfSum = this.sumHeaderRow && this.sumColumn;
     }
 
     if ("values" in data) this._data = data.values;
@@ -199,8 +194,8 @@ export class Grid<T = {}, C = string, R = string> {
   private get rowItemsData(): (string | number)[] {
     const rowItems: (string | number)[] = [];
 
-    if (this.showColumnHeader) rowItems.push("");
-    if (this.sumHeaderRow) rowItems.push("計");
+    if (this.showColumnHeader) rowItems.push(this.gridLabel);
+    if (this.sumHeaderRow) rowItems.push(this.sumHeaderRowLabel);
 
     const converter = this.rowConverter;
     rowItems.push(
@@ -229,7 +224,7 @@ export class Grid<T = {}, C = string, R = string> {
   private get sumColumnData(): string[] {
     const sumColumn: string[] = [];
 
-    if (this.showColumnHeader) sumColumn.push("");
+    if (this.showColumnHeader) sumColumn.push(this.sumColumnLabel);
     if (this.sumHeaderRow) {
       if (this.sumOfSum) {
         // TODO: check sumColumn and sumRow is equal

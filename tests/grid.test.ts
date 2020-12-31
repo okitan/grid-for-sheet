@@ -37,13 +37,14 @@ describe(Grid, () => {
 
     test("with showHeader both column and row returns included headers", () => {
       const grid = new Grid({
+        label: "ラベル",
         column: { items: ["行1", "行2"], showHeader: true },
         row: { items: ["列1"], showHeader: true },
         data: { values: [["文字", 1]] },
       });
 
       const expected = [
-        ["", "行1", "行2"],
+        ["ラベル", "行1", "行2"],
         ["列1", "文字", 1],
       ];
 
@@ -57,7 +58,7 @@ describe(Grid, () => {
       const grid = new Grid({
         column: { items: ["行1", "行2"] },
         row: { items: ["列1", "列2"], showHeader: true },
-        sum: { column: {} },
+        sum: { column: { label: "列計" } },
         data: {
           values: [
             ["文字1", 1],
@@ -67,34 +68,9 @@ describe(Grid, () => {
       });
 
       const expected = [
-        ["計", "=SUM(B2:B3)", "=SUM(C2:C3)"],
+        ["列計", "=SUM(B2:B3)", "=SUM(C2:C3)"],
         ["列1", "文字1", 1],
         ["列2", "文字2", 2],
-      ];
-
-      expect(grid.data).toEqual(expected);
-    });
-
-    test("with sumOfSum but no sumRow options", () => {
-      const grid = new Grid({
-        startColumn: 1,
-        startRow: 2,
-        column: { items: ["行1", "行2"], showHeader: true },
-        row: { items: ["列1", "列2"], showHeader: true },
-        sum: { column: {}, total: true },
-        data: {
-          values: [
-            ["文字1", 1],
-            ["文字2", 2],
-          ],
-        },
-      });
-
-      const expected = [
-        ["", "行1", "行2", ""],
-        ["計", "=SUM(C5:C6)", "=SUM(D5:D6)", "=SUM(C4:D4)"],
-        ["列1", "文字1", 1, ""],
-        ["列2", "文字2", 2, ""],
       ];
 
       expect(grid.data).toEqual(expected);
@@ -106,7 +82,7 @@ describe(Grid, () => {
         startRow: 2,
         column: { items: ["行1", "行2"], showHeader: true },
         row: { items: ["列1", "列2"], showHeader: true },
-        sum: { column: {}, row: {}, total: true },
+        sum: { column: { label: "列計" }, row: { label: "総計" } },
         data: {
           values: [
             ["文字1", 1],
@@ -116,8 +92,8 @@ describe(Grid, () => {
       });
 
       const expected = [
-        ["", "行1", "行2", ""],
-        ["計", "=SUM(C5:C6)", "=SUM(D5:D6)", "=SUM(C4:D4)"],
+        ["", "行1", "行2", "総計"],
+        ["列計", "=SUM(C5:C6)", "=SUM(D5:D6)", "=SUM(C4:D4)"],
         ["列1", "文字1", 1, "=SUM(C5:D5)"],
         ["列2", "文字2", 2, "=SUM(C6:D6)"],
       ];
@@ -135,15 +111,15 @@ describe(Grid, () => {
       const grid = new Grid<{ hoge: string }>({
         column: { items: ["行1", "行2"], showHeader: true },
         row: { items: ["列1", "列2"], showHeader: true },
-        sum: { column: {}, row: {} },
+        sum: { column: { label: "列計" }, row: { label: "総計" } },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
       grid.generate({ hoge: "fuga" });
 
       const expected = [
-        ["", "行1", "行2", ""],
-        ["計", "=SUM(B3:B4)", "=SUM(C3:C4)", ""],
+        ["", "行1", "行2", "総計"],
+        ["列計", "=SUM(B3:B4)", "=SUM(C3:C4)", "=SUM(B2:C2)"],
         ["列1", "fuga:行1:0/列1:0", "fuga:行2:1/列1:0", "=SUM(B3:C3)"],
         ["列2", "fuga:行1:0/列2:1", "fuga:行2:1/列2:1", "=SUM(B4:C4)"],
       ];
@@ -184,15 +160,15 @@ describe(Grid, () => {
           showHeader: true,
           converter: (row, j) => `${row?.ugu}:${j}`,
         },
-        sum: { column: {}, row: {} },
+        sum: { column: { label: "列計" }, row: { label: "総計" } },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column?.fuga}:${i}/${row?.ugu}:${j}` },
       });
 
       grid.generate({ hoge: "fuga" });
 
       const expected = [
-        ["", "行1:0", "行2:1", ""],
-        ["計", "=SUM(B3:B4)", "=SUM(C3:C4)", ""],
+        ["", "行1:0", "行2:1", "総計"],
+        ["列計", "=SUM(B3:B4)", "=SUM(C3:C4)", "=SUM(B2:C2)"],
         ["列1:0", "fuga:行1:0/列1:0", "fuga:行2:1/列1:0", "=SUM(B3:C3)"],
         ["列2:1", "fuga:行1:0/列2:1", "fuga:行2:1/列2:1", "=SUM(B4:C4)"],
       ];
@@ -254,7 +230,7 @@ describe(Grid, () => {
         showHeader: true,
         headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
       },
-      sum: { column: { pixelSize: 8 }, row: {}, total: true },
+      sum: { column: { pixelSize: 8 }, row: {} },
       data: {
         generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
         format: (column, i, row, j) => ({ textDirection: `${column}:${i}/${row}:${j}` }),
@@ -318,7 +294,7 @@ describe(Grid, () => {
               },
               Object {
                 "userEnteredValue": Object {
-                  "stringValue": "",
+                  "stringValue": "SUM",
                 },
               },
             ],
@@ -327,7 +303,7 @@ describe(Grid, () => {
             "values": Array [
               Object {
                 "userEnteredValue": Object {
-                  "stringValue": "計",
+                  "stringValue": "SUM",
                 },
               },
               Object {
