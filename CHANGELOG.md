@@ -1,9 +1,22 @@
+## 2.0.0 - 2020-12-31
+
+### Added
+
+- add `data.format` to format data cell
+- `createRightGrid` and `createLowerGrid` to create relative grid considering grid size
+- labels
+
+### Changed
+
+- constructor params are drastically changed
+- remove `sumOfSum` option. When both `sum.row` and `sum.column` is assigned, it alwasys show sum of sum
+
 ## 1.4.0 - 2020-12-30
 
 ### Changed
 
-- sumColumnOrigin returns sumColumn's origin (it formerly returns sumHeaderRow's origin)
-- added sumHeaderRowOrigin returns sumHeaderRow's origin
+- `sumColumnOrigin` returns sumColumn's origin (it formerly returns sumHeaderRow's origin)
+- added `sumHeaderRowOrigin` returns sumHeaderRow's origin
 
 ## 1.3.0 - 2020-12-29
 
@@ -13,7 +26,7 @@
 
 ### Fixed
 
-- fix sum row range caluculation, in case startRow and startColumn is different
+- fix sum row range caluculation, in case `startRow` and `startColumn` is different
 
 ## 1.2.0 - 2020-12-28
 
