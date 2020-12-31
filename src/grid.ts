@@ -3,28 +3,23 @@ import { sheets_v4 } from "googleapis";
 import { Cell } from "./cell";
 
 export type GridConstructor<T, C, R> = {
-  sheet?: Grid<T, C, R>["sheet"];
-  startColumn?: Grid<T, C, R>["startColumn"];
-  startRow?: Grid<T, C, R>["startRow"];
+  sheet?: string;
+  startColumn?: number;
+  startRow?: number;
   column?: { pixelSize?: number } & (
-    | // sum
-    { sum: true; sumPixelSize?: number; sumOfSum?: true }
-    | { sum?: false }
-  ) &
-    (
-      | ({
-          showHeader: true;
-          items: Grid<T, C, R>["_columnItems"];
-          headerFormat?: Grid<T, C, R>["columnHeaderFormat"];
-        } & (Exclude<C, string | number> extends never
-          ? { converter?: Grid<T, C, R>["columnConverter"] }
-          : { converter: Grid<T, C, R>["columnConverter"] }))
-      | {
-          showHeader?: false;
-          items?: Grid<T, C, R>["_columnItems"];
-        }
-    );
-  row?: { sum?: boolean } & (
+    | ({
+        showHeader: true;
+        items: Grid<T, C, R>["_columnItems"];
+        headerFormat?: Grid<T, C, R>["columnHeaderFormat"];
+      } & (Exclude<C, string | number> extends never
+        ? { converter?: Grid<T, C, R>["columnConverter"] }
+        : { converter: Grid<T, C, R>["columnConverter"] }))
+    | {
+        showHeader?: false;
+        items?: Grid<T, C, R>["_columnItems"];
+      }
+  );
+  row?:
     | ({
         showHeader: true;
         items: Grid<T, C, R>["_rowItems"];
@@ -36,6 +31,26 @@ export type GridConstructor<T, C, R> = {
     | {
         showHeader?: false;
         items?: Grid<T, C, R>["_rowItems"];
+      };
+  sum?: {
+    row?: {
+      label?: string; // only shown when headerRow is present
+      pixelSize?: number;
+    };
+  } & (
+    | {
+        total?: true;
+        column: {
+          label?: string; // only shown when headerColumn is present
+          pixelSize?: number;
+        };
+      }
+    | {
+        total?: false;
+        column?: {
+          label?: string;
+          pixelSize: number;
+        };
       }
   );
   data: { format?: Grid<T, C, R>["dataFormat"] } & (
@@ -89,7 +104,7 @@ export class Grid<T = {}, C = string, R = string> {
   // dynamic
   readonly dataGenerator?: (column: C, columnIndex: number, row: R, rowIndex: number, args: T) => string | number;
 
-  constructor({ sheet, startColumn, startRow, column, row, data }: GridConstructor<T, C, R>) {
+  constructor({ sheet, startColumn, startRow, column, row, sum, data }: GridConstructor<T, C, R>) {
     if (sheet) this.sheet = sheet;
     if (startColumn) this.startColumn = startColumn;
     if (startRow) this.startRow = startRow;
@@ -100,11 +115,6 @@ export class Grid<T = {}, C = string, R = string> {
       if ("converter" in column) this.columnConverter = column.converter;
       if ("headerFormat" in column) this.columnHeaderFormat = column.headerFormat;
 
-      // column.sum is the sum of column, and we should add them as row
-      if (column.sum) this.sumHeaderRow = column.sum;
-      if ("sumPixelSize" in column) this.sumHeaderRowPixelSize = column.sumPixelSize;
-      if ("sumOfSum" in column) this.sumOfSum = true;
-
       if (column.pixelSize) this.columnPixelSize = column.pixelSize;
     }
 
@@ -114,10 +124,24 @@ export class Grid<T = {}, C = string, R = string> {
       if ("converter" in row) this.rowConverter = row.converter;
       if ("headerFormat" in row) this.rowHeaderFormat = row.headerFormat;
 
-      // row.sum is the sum of row, and we should add them as column
-      if (row.sum) this.sumColumn = row.sum;
-
       if ("headerPixelSize" in row) this.rowHeaderPixelSize = row.headerPixelSize;
+    }
+
+    if (sum) {
+      if (sum.column) {
+        // column.sum is the sum of column, and we should add them as row
+        this.sumHeaderRow = true;
+        if (sum.column.pixelSize) this.sumHeaderRowPixelSize = sum.column.pixelSize;
+        // if (sum.column.label) // TODO:
+      }
+      if (sum.row) {
+        // row.sum is the sum of row, and we should add them as column
+        this.sumColumn = true;
+        // if (sum.row.pixelSize) this.sumColumnPixelSize = sum.row.pixelSize;
+      }
+      if (sum.total) {
+        this.sumOfSum = true;
+      }
     }
 
     if ("values" in data) this._data = data.values;

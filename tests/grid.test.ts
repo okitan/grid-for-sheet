@@ -55,8 +55,9 @@ describe(Grid, () => {
 
     test("with sumColumnHeader and no showColumnHeader", () => {
       const grid = new Grid({
-        column: { items: ["行1", "行2"], sum: true },
+        column: { items: ["行1", "行2"] },
         row: { items: ["列1", "列2"], showHeader: true },
+        sum: { column: {} },
         data: {
           values: [
             ["文字1", 1],
@@ -78,8 +79,9 @@ describe(Grid, () => {
       const grid = new Grid({
         startColumn: 1,
         startRow: 2,
-        column: { items: ["行1", "行2"], showHeader: true, sum: true, sumOfSum: true },
+        column: { items: ["行1", "行2"], showHeader: true },
         row: { items: ["列1", "列2"], showHeader: true },
+        sum: { column: {}, total: true },
         data: {
           values: [
             ["文字1", 1],
@@ -102,8 +104,9 @@ describe(Grid, () => {
       const grid = new Grid({
         startColumn: 1,
         startRow: 2,
-        column: { items: ["行1", "行2"], showHeader: true, sum: true, sumOfSum: true },
-        row: { items: ["列1", "列2"], showHeader: true, sum: true },
+        column: { items: ["行1", "行2"], showHeader: true },
+        row: { items: ["列1", "列2"], showHeader: true },
+        sum: { column: {}, row: {}, total: true },
         data: {
           values: [
             ["文字1", 1],
@@ -130,8 +133,9 @@ describe(Grid, () => {
 
     test("with dataGenerator returns generated data", () => {
       const grid = new Grid<{ hoge: string }>({
-        column: { items: ["行1", "行2"], showHeader: true, sum: true },
-        row: { items: ["列1", "列2"], showHeader: true, sum: true },
+        column: { items: ["行1", "行2"], showHeader: true },
+        row: { items: ["列1", "列2"], showHeader: true },
+        sum: { column: {}, row: {} },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
@@ -173,15 +177,14 @@ describe(Grid, () => {
         column: {
           items: [{ fuga: "行1" }, { fuga: "行2" }],
           showHeader: true,
-          sum: true,
           converter: (column, i) => `${column?.fuga}:${i}`,
         },
         row: {
           items: [{ ugu: "列1" }, { ugu: "列2" }],
           showHeader: true,
-          sum: true,
           converter: (row, j) => `${row?.ugu}:${j}`,
         },
+        sum: { column: {}, row: {} },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column?.fuga}:${i}/${row?.ugu}:${j}` },
       });
 
@@ -243,18 +246,15 @@ describe(Grid, () => {
       column: {
         items: ["行1", "行2", "行3"],
         showHeader: true,
-        sum: true,
         headerFormat: { textFormat: { bold: true } },
         pixelSize: 7,
-        sumPixelSize: 8,
-        sumOfSum: true,
       },
       row: {
         items: ["列1", "列2"],
         showHeader: true,
-        sum: true,
         headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
       },
+      sum: { column: { pixelSize: 8 }, row: {}, total: true },
       data: {
         generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
         format: (column, i, row, j) => ({ textDirection: `${column}:${i}/${row}:${j}` }),
@@ -448,8 +448,9 @@ describe(Grid, () => {
   describe("#toRange", () => {
     test("returns notation", () => {
       const grid = new Grid<{ hoge: string }>({
-        column: { items: ["行1", "行2"], showHeader: true, sum: true },
-        row: { items: ["列1", "列2"], showHeader: true, sum: true },
+        column: { items: ["行1", "行2"], showHeader: true },
+        row: { items: ["列1", "列2"], showHeader: true },
+        sum: { column: {}, row: {} },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
@@ -463,17 +464,15 @@ describe(Grid, () => {
         column: {
           items: ["行1", "行2", "行3"],
           showHeader: true,
-          sum: true,
           headerFormat: { textFormat: { bold: true } },
           pixelSize: 7,
-          sumPixelSize: 8,
         },
         row: {
           items: ["列1", "列2"],
           showHeader: true,
-          sum: true,
           headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
         },
+        sum: { column: { pixelSize: 8 }, row: {} },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
@@ -487,17 +486,15 @@ describe(Grid, () => {
         column: {
           items: ["行1", "行2", "行3"],
           showHeader: true,
-          sum: true,
           headerFormat: { textFormat: { bold: true } },
           pixelSize: 7,
-          sumPixelSize: 8,
         },
         row: {
           items: ["列1", "列2"],
           showHeader: true,
-          sum: true,
           headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
         },
+        sum: { column: { pixelSize: 8 }, row: {} },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
@@ -511,17 +508,15 @@ describe(Grid, () => {
         column: {
           items: ["行1", "行2", "行3"],
           showHeader: true,
-          sum: true,
           headerFormat: { textFormat: { bold: true } },
           pixelSize: 7,
-          sumPixelSize: 8,
         },
         row: {
           items: ["列1", "列2"],
           showHeader: true,
-          sum: true,
           headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
         },
+        sum: { column: { pixelSize: 8 }, row: {} },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
