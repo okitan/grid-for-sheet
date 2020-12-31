@@ -230,7 +230,7 @@ describe(Grid, () => {
         showHeader: true,
         headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
       },
-      sum: { column: { pixelSize: 8 }, row: {} },
+      sum: { column: {}, row: { pixelSize: 8 } },
       data: {
         generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}`,
         format: (column, i, row, j) => ({ textDirection: `${column}:${i}/${row}:${j}` }),
@@ -434,7 +434,7 @@ describe(Grid, () => {
     });
   });
 
-  describe("#findSumHeaderRowCell", () => {
+  describe("#findcolumnTotalHeaderCell", () => {
     test("returns cell", () => {
       const grid = new Grid<{ hoge: string }>({
         column: { items: ["行1", "行2", "行3"], showHeader: true },
@@ -443,11 +443,11 @@ describe(Grid, () => {
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
-      expect(grid.findSumHeaderRowCell("行2")?.notation).toEqual("C2");
+      expect(grid.findcolumnTotalHeaderCell("行2")?.notation).toEqual("C2");
     });
   });
 
-  describe("#findSumColumnCell", () => {
+  describe("#findrowTotalCell", () => {
     test("returns cell", () => {
       const grid = new Grid<{ hoge: string }>({
         column: { items: ["行1", "行2", "行3"], showHeader: true },
@@ -456,7 +456,7 @@ describe(Grid, () => {
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
-      expect(grid.findSumColumnCell("列2")?.notation).toEqual("E4");
+      expect(grid.findrowTotalCell("列2")?.notation).toEqual("E4");
     });
   });
 

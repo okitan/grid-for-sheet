@@ -36,7 +36,6 @@ export type GridConstructor<T, C, R> = {
   sum?: {
     column?: {
       label?: string;
-      pixelSize?: number;
     };
     row?: {
       label?: string; // only shown when headerRow is present
@@ -87,12 +86,12 @@ export class Grid<T = {}, C = string, R = string> {
     | ((row: R, rowIndex: number) => sheets_v4.Schema$CellFormat | undefined);
   readonly rowHeaderPixelSize?: number;
 
-  readonly sumHeaderRow: boolean = false;
-  readonly sumHeaderRowLabel: string = "SUM";
-  readonly sumHeaderRowPixelSize?: number;
+  readonly columnTotalHeader: boolean = false;
+  readonly columnTotalHeaderLabel: string = "SUM";
 
-  readonly sumColumn: boolean = false;
-  readonly sumColumnLabel: string = "SUM";
+  readonly rowTotal: boolean = false;
+  readonly rowTotalLabel: string = "SUM";
+  readonly rowTotalPixelSize?: number;
 
   // dynamic
   readonly dataGenerator?: (column: C, columnIndex: number, row: R, rowIndex: number, args: T) => string | number;
@@ -123,16 +122,14 @@ export class Grid<T = {}, C = string, R = string> {
 
     if (sum) {
       if (sum.column) {
-        // column.sum is the sum of column, and we should add them as row
-        this.sumHeaderRow = true;
-        if (sum.column.pixelSize) this.sumHeaderRowPixelSize = sum.column.pixelSize;
-        if (sum.column.label) this.sumHeaderRowLabel = sum.column.label;
+        this.columnTotalHeader = true;
+        if (sum.column.label) this.columnTotalHeaderLabel = sum.column.label;
       }
       if (sum.row) {
         // row.sum is the sum of row, and we should add them as column
-        this.sumColumn = true;
-        if (sum.row.label) this.sumColumnLabel = sum.row.label;
-        // if (sum.row.pixelSize) this.sumColumnPixelSize = sum.row.pixelSize;
+        this.rowTotal = true;
+        if (sum.row.label) this.rowTotalLabel = sum.row.label;
+        if (sum.row.pixelSize) this.rowTotalPixelSize = sum.row.pixelSize;
       }
     }
 
@@ -161,7 +158,7 @@ export class Grid<T = {}, C = string, R = string> {
 
     // columns first
     // Note: do not consider rowHeader's column header
-    if (this.sumHeaderRow) data.unshift(this.sumHeaderRowData);
+    if (this.columnTotalHeader) data.unshift(this.columnTotalHeaderData);
 
     if (this.showColumnHeader) {
       if (!this._columnItems) throw new Error("showColumnHeader requries columnItems");
@@ -181,8 +178,8 @@ export class Grid<T = {}, C = string, R = string> {
       data.forEach((row, i) => row.unshift(this.rowItemsData[i]));
     }
 
-    if (this.sumColumn) {
-      data.forEach((row, i) => row.push(this.sumColumnData[i]));
+    if (this.rowTotal) {
+      data.forEach((row, i) => row.push(this.rowTotalData[i]));
     }
 
     return data;
@@ -192,7 +189,7 @@ export class Grid<T = {}, C = string, R = string> {
     const rowItems: (string | number)[] = [];
 
     if (this.showColumnHeader) rowItems.push(this.gridLabel);
-    if (this.sumHeaderRow) rowItems.push(this.sumHeaderRowLabel);
+    if (this.columnTotalHeader) rowItems.push(this.columnTotalHeaderLabel);
 
     const converter = this.rowConverter;
     rowItems.push(
@@ -206,8 +203,8 @@ export class Grid<T = {}, C = string, R = string> {
     return rowItems;
   }
 
-  // this does not consider showRowHeader and sumColumn
-  private get sumHeaderRowData(): string[] {
+  // this does not consider showRowHeader and rowTotal
+  private get columnTotalHeaderData(): string[] {
     const columnOffset = this.startColumn + (this.showRowHeader ? 1 : 0);
 
     return [...Array(this.dataColumnLength).keys()].map((i) => {
@@ -218,30 +215,30 @@ export class Grid<T = {}, C = string, R = string> {
     });
   }
 
-  private get sumColumnData(): string[] {
-    const sumColumn: string[] = [];
+  private get rowTotalData(): string[] {
+    const rowTotal: string[] = [];
 
-    if (this.showColumnHeader) sumColumn.push(this.sumColumnLabel);
-    if (this.sumHeaderRow) {
-      if (this.sumHeaderRow && this.sumColumn) {
-        // TODO: check sumColumn and sumRow is equal
-        sumColumn.push(`=SUM(${this.sumHeaderRowOrigin?.toRange({ right: this.dataColumnLength - 1 })})`);
+    if (this.showColumnHeader) rowTotal.push(this.rowTotalLabel);
+    if (this.columnTotalHeader) {
+      if (this.columnTotalHeader && this.rowTotal) {
+        // TODO: check rowTotal and sumRow is equal
+        rowTotal.push(`=SUM(${this.columnTotalHeaderOrigin?.toRange({ right: this.dataColumnLength - 1 })})`);
       } else {
-        sumColumn.push("");
+        rowTotal.push("");
       }
     }
 
-    if (this.sumColumn) {
-      sumColumn.push(
+    if (this.rowTotal) {
+      rowTotal.push(
         ...[...Array(this.dataRowLength).keys()].map(
           (i) => `=SUM(${this.dataOrigin.relative({ bottom: i }).toRange({ right: this.dataColumnLength - 1 })})`
         )
       );
     } else {
-      sumColumn.push(...Array(this.dataRowLength).fill(""));
+      rowTotal.push(...Array(this.dataRowLength).fill(""));
     }
 
-    return sumColumn;
+    return rowTotal;
   }
 
   private get metadata(): (sheets_v4.Schema$CellFormat | undefined)[][] {
@@ -264,7 +261,7 @@ export class Grid<T = {}, C = string, R = string> {
 
     // columns first
     // Note: do not consider rowHeader's column header
-    if (this.sumHeaderRow) {
+    if (this.columnTotalHeader) {
       data.unshift([...Array(this.dataColumnLength)]);
     }
 
@@ -304,7 +301,7 @@ export class Grid<T = {}, C = string, R = string> {
         switch (typeof rowHeaderFormat) {
           case "object":
             data.forEach((row, i) => {
-              const index = i - (this.showColumnHeader ? 1 : 0) - (this.sumHeaderRow ? 1 : 0);
+              const index = i - (this.showColumnHeader ? 1 : 0) - (this.columnTotalHeader ? 1 : 0);
 
               row.unshift(
                 index >= 0 ? (Array.isArray(rowHeaderFormat) ? rowHeaderFormat[index] : rowHeaderFormat) : undefined
@@ -313,7 +310,7 @@ export class Grid<T = {}, C = string, R = string> {
             break;
           case "function":
             data.forEach((row, i) => {
-              const index = i - (this.showColumnHeader ? 1 : 0) - (this.sumHeaderRow ? 1 : 0);
+              const index = i - (this.showColumnHeader ? 1 : 0) - (this.columnTotalHeader ? 1 : 0);
 
               row.unshift(index >= 0 ? rowHeaderFormat(this.rowItems[index], index) : undefined);
             });
@@ -326,7 +323,7 @@ export class Grid<T = {}, C = string, R = string> {
       }
     }
 
-    if (this.sumColumn) {
+    if (this.rowTotal) {
       // TODO:
       data.forEach((row) => row.push(undefined));
     }
@@ -338,7 +335,7 @@ export class Grid<T = {}, C = string, R = string> {
     metrics
    */
   get columnLength(): number {
-    return (this.showRowHeader ? 1 : 0) + this.dataColumnLength + (this.sumColumn ? 1 : 0);
+    return (this.showRowHeader ? 1 : 0) + this.dataColumnLength + (this.rowTotal ? 1 : 0);
   }
 
   private get dataColumnLength(): number {
@@ -346,7 +343,7 @@ export class Grid<T = {}, C = string, R = string> {
   }
 
   get rowLength(): number {
-    return (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0) + this.dataRowLength;
+    return (this.showColumnHeader ? 1 : 0) + (this.columnTotalHeader ? 1 : 0) + this.dataRowLength;
   }
 
   private get dataRowLength(): number {
@@ -385,7 +382,7 @@ export class Grid<T = {}, C = string, R = string> {
     };
 
     // columnMetadata
-    if (this.rowHeaderPixelSize || this.columnPixelSize || this.sumHeaderRowPixelSize) {
+    if (this.rowHeaderPixelSize || this.columnPixelSize || this.rowTotalPixelSize) {
       data.columnMetadata = [];
 
       if (this.showRowHeader)
@@ -395,8 +392,7 @@ export class Grid<T = {}, C = string, R = string> {
         ...Array(this.dataColumnLength).fill(this.columnPixelSize ? { pixelSize: this.columnPixelSize } : {})
       );
 
-      if (this.sumColumn)
-        data.columnMetadata.push(this.sumHeaderRowPixelSize ? { pixelSize: this.sumHeaderRowPixelSize } : {});
+      if (this.rowTotal) data.columnMetadata.push(this.rowTotalPixelSize ? { pixelSize: this.rowTotalPixelSize } : {});
     }
 
     return data;
@@ -409,20 +405,20 @@ export class Grid<T = {}, C = string, R = string> {
     return new Cell({ sheet: this.sheet, column: this.startColumn, row: this.startRow });
   }
 
-  get sumHeaderRowOrigin(): Cell | undefined {
-    return this.sumHeaderRow
+  get columnTotalHeaderOrigin(): Cell | undefined {
+    return this.columnTotalHeader
       ? this.origin.relative({ right: this.showRowHeader ? 1 : 0, bottom: this.showColumnHeader ? 1 : 0 })
       : undefined;
   }
 
-  get sumColumnOirigin(): Cell | undefined {
-    return this.sumColumn
+  get rowTotalOirigin(): Cell | undefined {
+    return this.rowTotal
       ? this.origin.relative({ right: this.columnLength - 1, bottom: this.rowLength - this.dataRowLength })
       : undefined;
   }
 
   get sumOfSumOrigin(): Cell | undefined {
-    return this.sumHeaderRow && this.sumColumn
+    return this.columnTotalHeader && this.rowTotal
       ? this.origin.relative({ right: this.columnLength - 1, bottom: this.showColumnHeader ? 1 : 0 })
       : undefined;
   }
@@ -430,22 +426,22 @@ export class Grid<T = {}, C = string, R = string> {
   get dataOrigin(): Cell {
     return this.origin.relative({
       right: this.showRowHeader ? 1 : 0,
-      bottom: (this.showColumnHeader ? 1 : 0) + (this.sumHeaderRow ? 1 : 0),
+      bottom: (this.showColumnHeader ? 1 : 0) + (this.columnTotalHeader ? 1 : 0),
     });
   }
 
-  findSumHeaderRowCell(column: C): Cell | undefined {
+  findcolumnTotalHeaderCell(column: C): Cell | undefined {
     const index = this.indexColumnOf(column);
     if (index < 0) return;
 
-    return this.sumHeaderRowOrigin?.relative({ right: index });
+    return this.columnTotalHeaderOrigin?.relative({ right: index });
   }
 
-  findSumColumnCell(row: R): Cell | undefined {
+  findrowTotalCell(row: R): Cell | undefined {
     const index = this.indexRowOf(row);
     if (index < 0) return;
 
-    return this.sumColumnOirigin?.relative({ bottom: index });
+    return this.rowTotalOirigin?.relative({ bottom: index });
   }
 
   findDataCell({ column, row }: { column?: C; row?: R }): Cell | undefined {
