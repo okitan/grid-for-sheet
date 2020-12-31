@@ -426,7 +426,7 @@ describe(Grid, () => {
       const grid = new Grid<{ hoge: string }>({
         column: { items: ["行1", "行2"], showHeader: true },
         row: { items: ["列1", "列2"], showHeader: true },
-        sum: { column: {}, row: {} },
+        sum: { column: true, row: true },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
@@ -439,7 +439,7 @@ describe(Grid, () => {
       const grid = new Grid<{ hoge: string }>({
         column: { items: ["行1", "行2", "行3"], showHeader: true },
         row: { items: ["列1", "列2"], showHeader: true },
-        sum: { column: {}, row: {} },
+        sum: { column: true, row: true },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
@@ -452,7 +452,7 @@ describe(Grid, () => {
       const grid = new Grid<{ hoge: string }>({
         column: { items: ["行1", "行2", "行3"], showHeader: true },
         row: { items: ["列1", "列2"], showHeader: true },
-        sum: { column: {}, row: {} },
+        sum: { column: true, row: true },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
@@ -465,7 +465,7 @@ describe(Grid, () => {
       const grid = new Grid<{ hoge: string }>({
         column: { items: ["行1", "行2", "行3"], showHeader: true },
         row: { items: ["列1", "列2"], showHeader: true },
-        sum: { column: {}, row: {} },
+        sum: { column: true, row: true },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 

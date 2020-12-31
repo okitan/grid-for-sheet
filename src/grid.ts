@@ -34,13 +34,17 @@ export type GridConstructor<T, C, R> = {
         items?: Grid<T, C, R>["_rowItems"];
       };
   sum?: {
-    column?: {
-      label?: string;
-    };
-    row?: {
-      label?: string; // only shown when headerRow is present
-      pixelSize?: number;
-    };
+    column?:
+      | true
+      | {
+          label?: string;
+        };
+    row?:
+      | true
+      | {
+          label?: string; // only shown when headerRow is present
+          pixelSize?: number;
+        };
   };
   data: { format?: Grid<T, C, R>["dataFormat"] } & (
     | {
@@ -123,13 +127,17 @@ export class Grid<T = {}, C = string, R = string> {
     if (sum) {
       if (sum.column) {
         this.columnTotalHeader = true;
-        if (sum.column.label) this.columnTotalHeaderLabel = sum.column.label;
+        if (typeof sum.column === "object") {
+          if (sum.column.label) this.columnTotalHeaderLabel = sum.column.label;
+        }
       }
       if (sum.row) {
         // row.sum is the sum of row, and we should add them as column
         this.rowTotal = true;
-        if (sum.row.label) this.rowTotalLabel = sum.row.label;
-        if (sum.row.pixelSize) this.rowTotalPixelSize = sum.row.pixelSize;
+        if (typeof sum.row === "object") {
+          if (sum.row.label) this.rowTotalLabel = sum.row.label;
+          if (sum.row.pixelSize) this.rowTotalPixelSize = sum.row.pixelSize;
+        }
       }
     }
 
