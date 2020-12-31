@@ -132,7 +132,6 @@ export class Grid<T = {}, C = string, R = string> {
         }
       }
       if (sum.row) {
-        // row.sum is the sum of row, and we should add them as column
         this.rowTotal = true;
         if (typeof sum.row === "object") {
           if (sum.row.label) this.rowTotalLabel = sum.row.label;

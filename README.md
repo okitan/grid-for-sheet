@@ -33,3 +33,23 @@ grid.toGridData();
 ```
 
 More usage: `tests/grid.test.ts`.
+
+## Terminology
+
+```
+     A     B     C     D
+1 |     | C1  | C2  |     | ← columnHeader
+2 |     | SUM | SUM | SOS | ← columnTotalHeader
+3 | R1  |     |     | SUM |
+4 | R2  |     |     | SUM |
+    ↑ rowHeader        ↑ rowTotal
+```
+
+- columnHeader
+  - activated by column.showHeader
+- columnTotalHeader
+  - activated by sum.column
+- rowHeader
+  - activated by row.showHeader
+- rowTotal
+  - activated by sum.row
