@@ -461,18 +461,9 @@ describe(Grid, () => {
   describe("#findSumHeaderRowCell", () => {
     test("returns cell", () => {
       const grid = new Grid<{ hoge: string }>({
-        column: {
-          items: ["行1", "行2", "行3"],
-          showHeader: true,
-          headerFormat: { textFormat: { bold: true } },
-          pixelSize: 7,
-        },
-        row: {
-          items: ["列1", "列2"],
-          showHeader: true,
-          headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
-        },
-        sum: { column: { pixelSize: 8 }, row: {} },
+        column: { items: ["行1", "行2", "行3"], showHeader: true },
+        row: { items: ["列1", "列2"], showHeader: true },
+        sum: { column: {}, row: {} },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
@@ -483,18 +474,9 @@ describe(Grid, () => {
   describe("#findSumColumnCell", () => {
     test("returns cell", () => {
       const grid = new Grid<{ hoge: string }>({
-        column: {
-          items: ["行1", "行2", "行3"],
-          showHeader: true,
-          headerFormat: { textFormat: { bold: true } },
-          pixelSize: 7,
-        },
-        row: {
-          items: ["列1", "列2"],
-          showHeader: true,
-          headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
-        },
-        sum: { column: { pixelSize: 8 }, row: {} },
+        column: { items: ["行1", "行2", "行3"], showHeader: true },
+        row: { items: ["列1", "列2"], showHeader: true },
+        sum: { column: {}, row: {} },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
@@ -505,18 +487,9 @@ describe(Grid, () => {
   describe("#findDataCell", () => {
     test("returns cell", () => {
       const grid = new Grid<{ hoge: string }>({
-        column: {
-          items: ["行1", "行2", "行3"],
-          showHeader: true,
-          headerFormat: { textFormat: { bold: true } },
-          pixelSize: 7,
-        },
-        row: {
-          items: ["列1", "列2"],
-          showHeader: true,
-          headerFormat: [{ textFormat: { fontSize: 1 } }, { textFormat: { fontSize: 2 } }],
-        },
-        sum: { column: { pixelSize: 8 }, row: {} },
+        column: { items: ["行1", "行2", "行3"], showHeader: true },
+        row: { items: ["列1", "列2"], showHeader: true },
+        sum: { column: {}, row: {} },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
