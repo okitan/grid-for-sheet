@@ -10,7 +10,7 @@ export type GridConstructor<T, C, R> = {
   column?: { pixelSize?: number } & (
     | ({
         showHeader: true;
-        items: Grid<T, C, R>["_columnItems"];
+        items: C[];
         headerFormat?: Grid<T, C, R>["columnHeaderFormat"];
       } & (Exclude<C, string | number> extends never
         ? { converter?: Grid<T, C, R>["columnConverter"] }
@@ -23,7 +23,7 @@ export type GridConstructor<T, C, R> = {
   row?:
     | ({
         showHeader: true;
-        items: Grid<T, C, R>["_rowItems"];
+        items: R[];
         headerFormat?: Grid<T, C, R>["rowHeaderFormat"];
         headerPixelSize?: number;
       } & (Exclude<R, string | number> extends never

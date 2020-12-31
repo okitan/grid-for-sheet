@@ -12,7 +12,7 @@ export function createRightGrid<T = {}, C = string, R = string>(
   });
 }
 
-export function createGridBelow<T = {}, C = string, R = string>(
+export function createLowerGrid<T = {}, C = string, R = string>(
   from: Grid<any, any, any>,
   { margin = 0, ...args }: { margin?: number } & GridConstructor<T, C, R>
 ) {
