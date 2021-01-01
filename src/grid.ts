@@ -163,11 +163,11 @@ export class Grid<T = {}, C = string, R = string> {
     ));
   }
 
-  get data(): (string | number)[][] {
+  get data(): (string | number | undefined)[][] {
     if (!this._data) throw new Error(`no data given. set data in constructor or set dataGenerator and generate`);
 
-    // deep copy
-    const data: (string | number)[][] = JSON.parse(JSON.stringify(this._data));
+    // subsequent process disrupt array
+    const data: (string | number | undefined)[][] = this._data.map((row) => [...row]);
 
     // columns first
     // Note: do not consider rowHeader's column header
@@ -267,7 +267,7 @@ export class Grid<T = {}, C = string, R = string> {
             return;
           default:
             const never: never = format;
-            throw never;
+            throw new Error(never);
         }
       })
     );
@@ -298,7 +298,7 @@ export class Grid<T = {}, C = string, R = string> {
             break;
           default:
             const never: never = columnHeaderFormat;
-            throw never;
+            throw new Error(never);
         }
       }
     }
@@ -331,7 +331,7 @@ export class Grid<T = {}, C = string, R = string> {
             break;
           default:
             const never: never = rowHeaderFormat;
-            throw never;
+            throw new Error(never);
         }
       }
     }

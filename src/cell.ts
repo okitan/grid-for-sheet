@@ -15,7 +15,7 @@ export class Cell {
         return {};
       default:
         const never: never = data;
-        throw never;
+        throw new Error(never);
     }
   }
 
@@ -88,11 +88,11 @@ export class Cell {
             return `${this.notation}:${this.columnName}`;
           default:
             const never: never = cellOrPosition;
-            throw never;
+            throw new Error(never);
         }
       default:
         const never: never = cellOrPosition;
-        throw never;
+        throw new Error(never);
     }
   }
 
