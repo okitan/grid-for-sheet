@@ -224,7 +224,7 @@ export class Grid<T = {}, C = string, R = string> {
       const from = new Cell({ column: columnOffset + i, row: this.startRow + (this.showColumnHeader ? 1 : 0) + 1 });
       const to = new Cell({ column: columnOffset + i, row: this.startRow + this.rowItemsData.length - 1 });
 
-      return `=SUM(${from.toRange(to)})`;
+      return `=SUM(${from.toRange(to, { local: true })})`;
     });
   }
 
@@ -235,7 +235,9 @@ export class Grid<T = {}, C = string, R = string> {
     if (this.columnTotalHeader) {
       if (this.columnTotalHeader && this.rowTotal) {
         // TODO: check rowTotal and sumRow is equal
-        rowTotal.push(`=SUM(${this.columnTotalHeaderOrigin?.toRange({ right: this.dataColumnLength - 1 })})`);
+        rowTotal.push(
+          `=SUM(${this.columnTotalHeaderOrigin?.toRange({ right: this.dataColumnLength - 1 }, { local: true })})`
+        );
       } else {
         rowTotal.push("");
       }
@@ -244,7 +246,10 @@ export class Grid<T = {}, C = string, R = string> {
     if (this.rowTotal) {
       rowTotal.push(
         ...[...Array(this.dataRowLength).keys()].map(
-          (i) => `=SUM(${this.dataOrigin.relative({ bottom: i }).toRange({ right: this.dataColumnLength - 1 })})`
+          (i) =>
+            `=SUM(${this.dataOrigin
+              .relative({ bottom: i })
+              .toRange({ right: this.dataColumnLength - 1 }, { local: true })})`
         )
       );
     } else {

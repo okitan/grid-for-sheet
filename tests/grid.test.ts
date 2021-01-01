@@ -78,6 +78,7 @@ describe(Grid, () => {
 
     test("with every options", () => {
       const grid = new Grid({
+        sheet: "シート",
         startColumn: 1,
         startRow: 2,
         column: { items: ["行1", "行2"], showHeader: true },
