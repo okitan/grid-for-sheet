@@ -57,18 +57,28 @@ export class Cell {
     return new Cell({ sheet: this.sheet, column: this.column + right, row: this.row + bottom });
   }
 
+  toRange(opts?: { local: true }): string;
   toRange(cell?: Cell, opts?: { local: true }): string;
   toRange(relative?: { right?: number; bottom?: number }, opts?: { local: true }): string;
   toRange(destination?: "leftEnd" | "rightEnd" | "topEnd" | "bottomEnd", opts?: { local: true }): string;
 
   toRange(
-    cellOrPosition?: Cell | { right?: number; bottom?: number } | "leftEnd" | "rightEnd" | "topEnd" | "bottomEnd",
+    cellOrPosition?:
+      | { local: true }
+      | Cell
+      | { right?: number; bottom?: number }
+      | "leftEnd"
+      | "rightEnd"
+      | "topEnd"
+      | "bottomEnd",
     opts?: { local: true }
   ): string {
     switch (typeof cellOrPosition) {
       case "undefined":
         return opts?.local ? this.localNotation : this.notation;
       case "object":
+        if ("local" in cellOrPosition) return cellOrPosition.local ? this.localNotation : this.notation;
+
         if ("notation" in cellOrPosition) {
           // TODO: check sheet title is the same
           return `${opts?.local ? this.localNotation : this.notation}:${cellOrPosition.localNotation}`;
