@@ -1,7 +1,7 @@
 import { sheets_v4 } from "googleapis";
 
 export class Cell {
-  static data(data: string | number): sheets_v4.Schema$CellData {
+  static data(data: string | number | undefined): sheets_v4.Schema$CellData {
     switch (typeof data) {
       case "string":
         if (data.startsWith("=")) {
@@ -11,6 +11,8 @@ export class Cell {
         }
       case "number":
         return { userEnteredValue: { numberValue: data } };
+      case "undefined":
+        return {};
       default:
         const never: never = data;
         throw never;
