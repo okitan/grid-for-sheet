@@ -447,13 +447,26 @@ describe(Grid, () => {
   describe("#toRange", () => {
     test("returns notation", () => {
       const grid = new Grid<{ hoge: string }>({
+        sheet: "シート",
         column: { items: ["行1", "行2"], showHeader: true },
         row: { items: ["列1", "列2"], showHeader: true },
         sum: { column: true, row: true },
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
       });
 
-      expect(grid.toRange()).toEqual("A1:D4");
+      expect(grid.toRange()).toEqual("'シート'!A1:D4");
+    });
+
+    test("returns local notation", () => {
+      const grid = new Grid<{ hoge: string }>({
+        sheet: "シート",
+        column: { items: ["行1", "行2"], showHeader: true },
+        row: { items: ["列1", "列2"], showHeader: true },
+        sum: { column: true, row: true },
+        data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
+      });
+
+      expect(grid.toRange({ local: true })).toEqual("A1:D4");
     });
   });
 

@@ -517,7 +517,7 @@ export class Grid<T = {}, C = string, R = string> {
     return this._rowItems.findIndex((e, i) => converter(e, i) === converter(row, i));
   }
 
-  toRange(): string {
-    return this.origin.toRange({ right: this.columnLength - 1, bottom: this.rowLength - 1 });
+  toRange(opts?: { local: true }): string {
+    return this.origin.toRange({ right: this.columnLength - 1, bottom: this.rowLength - 1 }, opts);
   }
 }
