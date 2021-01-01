@@ -64,7 +64,7 @@ export class Grid<T = {}, C = string, R = string> {
 
   readonly gridLabel: string = "";
 
-  private _data?: (string | number)[][];
+  private _data?: (string | number | undefined)[][];
   readonly dataFormat?:
     | sheets_v4.Schema$CellFormat
     | sheets_v4.Schema$CellFormat[][]
@@ -98,7 +98,13 @@ export class Grid<T = {}, C = string, R = string> {
   readonly rowTotalPixelSize?: number;
 
   // dynamic
-  readonly dataGenerator?: (column: C, columnIndex: number, row: R, rowIndex: number, args: T) => string | number;
+  readonly dataGenerator?: (
+    column: C,
+    columnIndex: number,
+    row: R,
+    rowIndex: number,
+    args: T
+  ) => string | number | undefined;
 
   constructor({ sheet, startColumn, startRow, label, column, row, sum, data }: GridConstructor<T, C, R>) {
     if (sheet) this.sheet = sheet;
