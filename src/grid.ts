@@ -64,7 +64,7 @@ export class Grid<T = {}, C = string, R = string> {
 
   readonly gridLabel: string = "";
 
-  private _data?: (string | number)[][];
+  private _data?: (string | number | undefined)[][];
   readonly dataFormat?:
     | sheets_v4.Schema$CellFormat
     | sheets_v4.Schema$CellFormat[][]
@@ -98,7 +98,13 @@ export class Grid<T = {}, C = string, R = string> {
   readonly rowTotalPixelSize?: number;
 
   // dynamic
-  readonly dataGenerator?: (column: C, columnIndex: number, row: R, rowIndex: number, args: T) => string | number;
+  readonly dataGenerator?: (
+    column: C,
+    columnIndex: number,
+    row: R,
+    rowIndex: number,
+    args: T
+  ) => string | number | undefined;
 
   constructor({ sheet, startColumn, startRow, label, column, row, sum, data }: GridConstructor<T, C, R>) {
     if (sheet) this.sheet = sheet;
@@ -157,11 +163,11 @@ export class Grid<T = {}, C = string, R = string> {
     ));
   }
 
-  get data(): (string | number)[][] {
+  get data(): (string | number | undefined)[][] {
     if (!this._data) throw new Error(`no data given. set data in constructor or set dataGenerator and generate`);
 
-    // deep copy
-    const data: (string | number)[][] = JSON.parse(JSON.stringify(this._data));
+    // subsequent process disrupt array
+    const data: (string | number | undefined)[][] = this._data.map((row) => [...row]);
 
     // columns first
     // Note: do not consider rowHeader's column header
@@ -261,7 +267,7 @@ export class Grid<T = {}, C = string, R = string> {
             return;
           default:
             const never: never = format;
-            throw never;
+            throw new Error(never);
         }
       })
     );
@@ -292,7 +298,7 @@ export class Grid<T = {}, C = string, R = string> {
             break;
           default:
             const never: never = columnHeaderFormat;
-            throw never;
+            throw new Error(never);
         }
       }
     }
@@ -325,7 +331,7 @@ export class Grid<T = {}, C = string, R = string> {
             break;
           default:
             const never: never = rowHeaderFormat;
-            throw never;
+            throw new Error(never);
         }
       }
     }

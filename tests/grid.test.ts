@@ -217,6 +217,28 @@ describe(Grid, () => {
     });
   });
 
+  test("with datagenerator returns undefined", () => {
+    const grid = new Grid({
+      data: {
+        generator: () => undefined,
+      },
+    });
+
+    expect(grid.toGridData({})).toMatchInlineSnapshot(`
+      Object {
+        "rowData": Array [
+          Object {
+            "values": Array [
+              Object {},
+            ],
+          },
+        ],
+        "startColumn": 0,
+        "startRow": 0,
+      }
+    `);
+  });
+
   test("with format returns formatted Griddata", () => {
     const grid = new Grid<{ hoge: string }>({
       column: {
