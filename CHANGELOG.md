@@ -1,3 +1,10 @@
+## 2.1.0 - 2021-01-01
+
+### Added
+
+- toRange accept option of `{ local: true }` for in sheet reference
+- allow undefined for data
+
 ## 2.0.0 - 2020-12-31
 
 ### Added
