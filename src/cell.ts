@@ -46,46 +46,58 @@ export class Cell {
   }
 
   get notation(): string {
-    return this.sheet
-      ? `${this.escapeSheetName(this.sheet)}!${this.columnName}${this.rowNumber}`
-      : `${this.columnName}${this.rowNumber}`;
+    return this.sheet ? `${this.escapeSheetName(this.sheet)}!${this.localNotation}` : this.localNotation;
+  }
+
+  get localNotation(): string {
+    return `${this.columnName}${this.rowNumber}`;
   }
 
   relative({ right = 0, bottom = 0 }: { right?: number; bottom?: number }): Cell {
     return new Cell({ sheet: this.sheet, column: this.column + right, row: this.row + bottom });
   }
 
-  toRange(cell?: Cell): string;
-  toRange(relative?: { right?: number; bottom?: number }): string;
-  toRange(destination?: "leftEnd" | "rightEnd" | "topEnd" | "bottomEnd"): string;
+  toRange(opts?: { local: true }): string;
+  toRange(cell?: Cell, opts?: { local: true }): string;
+  toRange(relative?: { right?: number; bottom?: number }, opts?: { local: true }): string;
+  toRange(destination?: "leftEnd" | "rightEnd" | "topEnd" | "bottomEnd", opts?: { local: true }): string;
 
   toRange(
-    cellOrPosition?: Cell | { right?: number; bottom?: number } | "leftEnd" | "rightEnd" | "topEnd" | "bottomEnd"
+    cellOrPosition?:
+      | { local: true }
+      | Cell
+      | { right?: number; bottom?: number }
+      | "leftEnd"
+      | "rightEnd"
+      | "topEnd"
+      | "bottomEnd",
+    opts?: { local: true }
   ): string {
     switch (typeof cellOrPosition) {
       case "undefined":
-        return this.notation;
+        return opts?.local ? this.localNotation : this.notation;
       case "object":
-        if ("notation" in cellOrPosition) {
-          const otherCellNotation = cellOrPosition.notation;
+        if ("local" in cellOrPosition) return cellOrPosition.local ? this.localNotation : this.notation;
 
+        if ("notation" in cellOrPosition) {
           // TODO: check sheet title is the same
-          return `${this.notation}:${
-            otherCellNotation.includes("!") ? otherCellNotation.split("!")[1] : otherCellNotation
-          }`;
+          return `${opts?.local ? this.localNotation : this.notation}:${cellOrPosition.localNotation}`;
         } else {
-          return this.toRange(this.relative({ right: cellOrPosition.right || 0, bottom: cellOrPosition.bottom || 0 }));
+          return this.toRange(
+            this.relative({ right: cellOrPosition.right || 0, bottom: cellOrPosition.bottom || 0 }),
+            opts
+          );
         }
       case "string":
         switch (cellOrPosition) {
           case "leftEnd":
-            return new Cell({ sheet: this.sheet, column: 0, row: this.row }).toRange(this);
+            return new Cell({ sheet: this.sheet, column: 0, row: this.row }).toRange(this, opts);
           case "rightEnd":
-            return `${this.notation}:${this.rowNumber}`;
+            return `${opts?.local ? this.localNotation : this.notation}:${this.rowNumber}`;
           case "topEnd":
-            return new Cell({ sheet: this.sheet, column: this.column, row: 0 }).toRange(this);
+            return new Cell({ sheet: this.sheet, column: this.column, row: 0 }).toRange(this, opts);
           case "bottomEnd":
-            return `${this.notation}:${this.columnName}`;
+            return `${opts?.local ? this.localNotation : this.notation}:${this.columnName}`;
           default:
             const never: never = cellOrPosition;
             throw new Error(never);
