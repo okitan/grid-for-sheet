@@ -103,7 +103,8 @@ export class Grid<T = {}, C = string, R = string> {
     columnIndex: number,
     row: R,
     rowIndex: number,
-    args: T
+    args: T,
+    thisArg: Grid<T, C, R>
   ) => string | number | undefined;
 
   constructor({ sheet, startColumn, startRow, label, column, row, sum, data }: GridConstructor<T, C, R>) {
@@ -159,7 +160,7 @@ export class Grid<T = {}, C = string, R = string> {
     if (!dataGenerator) throw new Error(`no dataGenerator set`);
 
     return (this._data = this.rowItems.map((row, rowIndex) =>
-      this.columnItems.map((column, columnIndex) => dataGenerator(column, columnIndex, row, rowIndex, args))
+      this.columnItems.map((column, columnIndex) => dataGenerator(column, columnIndex, row, rowIndex, args, this))
     ));
   }
 
