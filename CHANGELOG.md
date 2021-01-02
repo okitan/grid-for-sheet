@@ -1,3 +1,13 @@
+## 2.2.0 - 2021-01-02
+
+### Added
+
+- to pass grid to generator
+
+### Fixed
+
+- allow data to have undefined
+
 ## 2.1.0 - 2021-01-01
 
 ### Added
