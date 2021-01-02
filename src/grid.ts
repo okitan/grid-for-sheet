@@ -48,7 +48,7 @@ export type GridConstructor<T, C, R> = {
   };
   data: { format?: Grid<T, C, R>["dataFormat"] } & (
     | {
-        values: (string | number)[][];
+        values: (string | number | undefined)[][];
       }
     | {
         generator: Grid<T, C, R>["dataGenerator"];
