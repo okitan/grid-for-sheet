@@ -43,7 +43,7 @@ export type GridConstructor<T, C, R> = {
       | true
       | {
           label?: string; // only shown when showColumnHeader is true
-          format?: Grid<T, C, R>["rowTotalFormat"];
+          labelFormat?: Grid<T, C, R>["rowTotalLabelFormat"];
           pixelSize?: number;
         };
   };
@@ -96,7 +96,7 @@ export class Grid<T = {}, C = string, R = string> {
 
   readonly rowTotal: boolean = false;
   readonly rowTotalLabel: string = "SUM";
-  readonly rowTotalFormat?: sheets_v4.Schema$CellFormat;
+  readonly rowTotalLabelFormat?: sheets_v4.Schema$CellFormat;
   readonly rowTotalPixelSize?: number;
 
   // dynamic
@@ -144,7 +144,7 @@ export class Grid<T = {}, C = string, R = string> {
         this.rowTotal = true;
         if (typeof sum.row === "object") {
           if (sum.row.label) this.rowTotalLabel = sum.row.label;
-          if (sum.row.format) this.rowTotalFormat = sum.row.format;
+          if (sum.row.labelFormat) this.rowTotalLabelFormat = sum.row.labelFormat;
           if (sum.row.pixelSize) this.rowTotalPixelSize = sum.row.pixelSize;
         }
       }
@@ -365,7 +365,7 @@ export class Grid<T = {}, C = string, R = string> {
     if (this.rowTotal) {
       // TODO: rowHeaderFormat
       if (this.showColumnHeader) {
-        data[0].push(this.rowTotalFormat);
+        data[0].push(this.rowTotalLabelFormat);
         data.slice(1).forEach((row) => row.push(undefined));
       } else {
         data.forEach((row) => row.push(undefined));
