@@ -52,7 +52,7 @@ More usage: `tests/grid.test.ts`.
 - rowHeader
   - activated by `row.showHeader`
 - rowTotal
-  - activated by sum.row
+  - activated by `sum.row`
 
 ### Labels
 
