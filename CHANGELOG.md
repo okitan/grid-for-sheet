@@ -1,3 +1,9 @@
+## 2.3.0 - 20201-01-23
+
+### Added
+
+- `sum.row.labelFormat` to decorize rowTotalLabel
+
 ## 2.2.0 - 2021-01-02
 
 ### Added
