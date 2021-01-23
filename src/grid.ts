@@ -6,7 +6,7 @@ export type GridConstructor<T, C, R> = {
   sheet?: string;
   startColumn?: number;
   startRow?: number;
-  label?: string; // only shown when both headerRow and headerColumn are present
+  label?: string; // only shown when both showColumnHeader and showRowHeader are true
   column?: { pixelSize?: number } & (
     | ({
         showHeader: true;
@@ -42,7 +42,8 @@ export type GridConstructor<T, C, R> = {
     row?:
       | true
       | {
-          label?: string; // only shown when headerRow is present
+          label?: string; // only shown when showColumnHeader is true
+          format?: Grid<T, C, R>["rowTotalFormat"];
           pixelSize?: number;
         };
   };
@@ -95,6 +96,7 @@ export class Grid<T = {}, C = string, R = string> {
 
   readonly rowTotal: boolean = false;
   readonly rowTotalLabel: string = "SUM";
+  readonly rowTotalFormat?: sheets_v4.Schema$CellFormat;
   readonly rowTotalPixelSize?: number;
 
   // dynamic
@@ -142,6 +144,7 @@ export class Grid<T = {}, C = string, R = string> {
         this.rowTotal = true;
         if (typeof sum.row === "object") {
           if (sum.row.label) this.rowTotalLabel = sum.row.label;
+          if (sum.row.format) this.rowTotalFormat = sum.row.format;
           if (sum.row.pixelSize) this.rowTotalPixelSize = sum.row.pixelSize;
         }
       }
@@ -164,6 +167,23 @@ export class Grid<T = {}, C = string, R = string> {
     ));
   }
 
+  /*
+    basic algorithm
+         A     B     C     D
+    1 |     | C1  | C2  |     | ← columnHeader
+    2 |     | SUM | SUM | SOS | ← columnTotalHeader
+    3 | R1  | DAT | DAT | SUM |
+    4 | R2  | DAT | DAT | SUM |
+      ↑ rowHeader        ↑ rowTotal
+
+    0. Given data (B3:C4)
+    1. columns turn (Note: do not treat rowHeader and rowTotal in this turn.)
+      1.1. insert columnTotalHeaderData(B2:C2)
+      1.2. insert columnHeaderLabels(B1:C1)
+    2. row turn
+      2.1 insert rowHeader(A1:A4)
+      2.2 insert rowTotal(D1:D4)
+   */
   get data(): (string | number | undefined)[][] {
     if (!this._data) throw new Error(`no data given. set data in constructor or set dataGenerator and generate`);
 
@@ -343,8 +363,13 @@ export class Grid<T = {}, C = string, R = string> {
     }
 
     if (this.rowTotal) {
-      // TODO:
-      data.forEach((row) => row.push(undefined));
+      // TODO: rowHeaderFormat
+      if (this.showColumnHeader) {
+        data[0].push(this.rowTotalFormat);
+        data.slice(1).forEach((row) => row.push(undefined));
+      } else {
+        data.forEach((row) => row.push(undefined));
+      }
     }
 
     return data;
