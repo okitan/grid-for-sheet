@@ -46,10 +46,21 @@ More usage: `tests/grid.test.ts`.
 ```
 
 - columnHeader
-  - activated by column.showHeader
+  - activated by `column.showHeader`
 - columnTotalHeader
-  - activated by sum.column
+  - activated by `sum.column`
 - rowHeader
-  - activated by row.showHeader
+  - activated by `row.showHeader`
 - rowTotal
   - activated by sum.row
+
+### Labels
+
+On the upper table, these cells can be set by labels.
+
+- gridLable(A1)
+  - set `label`, but only shown when rowHeader and columnHeader are present
+- rowTotalLabel(D1)
+  - set `sum.row.label`, but only shown when rowTotal and columnHeader are present
+- columnTotalHeaderLabel(A2)
+  - set `sum.column.label`, but only shown when rowHeader and columnTotalHeader are present
