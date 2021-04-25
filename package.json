@@ -28,6 +28,6 @@
   },
   "typings": "./lib/index.d.ts",
   "dependencies": {
-    "googleapis": "^71.0.0"
+    "googleapis": "^72.0.0"
   }
 }
