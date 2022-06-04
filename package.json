@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/okitan/grid-for-sheet#readme",
   "devDependencies": {
-    "@types/jest": "27.5.1",
+    "@types/jest": "27.5.2",
     "jest": "27.5.1",
     "prettier": "2.6.2",
     "ts-jest": "27.1.5",
