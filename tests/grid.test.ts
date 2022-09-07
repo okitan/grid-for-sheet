@@ -470,6 +470,25 @@ describe(Grid, () => {
     });
   });
 
+  describe("#toGridRange", () => {
+    test("returns grid range", () => {
+      const grid = new Grid<{ hoge: string }>({
+        sheet: "シート",
+        column: { items: ["行1", "行2"], showHeader: true },
+        row: { items: ["列1", "列2", "列3"], showHeader: true },
+        sum: { column: true, row: true },
+        data: { generator: (column, i, row, j, args) => `${args.hoge}:${column}:${i}/${row}:${j}` },
+      });
+
+      expect(grid.toGridRange()).toMatchObject({
+        startRowIndex: 0,
+        endRowIndex: 5,
+        startColumnIndex: 0,
+        endColumnIndex: 4,
+      });
+    });
+  });
+
   describe("#findcolumnTotalHeaderCell", () => {
     test("returns cell", () => {
       const grid = new Grid<{ hoge: string }>({
