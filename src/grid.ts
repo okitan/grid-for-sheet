@@ -4,6 +4,7 @@ import { Cell } from "./cell";
 
 export type GridConstructor<T, C, R> = {
   sheet?: string;
+  name?: string;
   startColumn?: number;
   startRow?: number;
   label?: string; // only shown when both showColumnHeader and showRowHeader are true
@@ -59,6 +60,7 @@ export type GridConstructor<T, C, R> = {
 
 export class Grid<T = {}, C = string, R = string> {
   readonly sheet?: string;
+  readonly name?: string;
 
   readonly startColumn: number = 0;
   readonly startRow: number = 0;
@@ -109,8 +111,9 @@ export class Grid<T = {}, C = string, R = string> {
     thisArg: Grid<T, C, R>
   ) => string | number | undefined;
 
-  constructor({ sheet, startColumn, startRow, label, column, row, sum, data }: GridConstructor<T, C, R>) {
+  constructor({ sheet, name, startColumn, startRow, label, column, row, sum, data }: GridConstructor<T, C, R>) {
     if (sheet) this.sheet = sheet;
+    if (name) this.name = name;
     if (startColumn) this.startColumn = startColumn;
     if (startRow) this.startRow = startRow;
     if (label) this.gridLabel = label;
