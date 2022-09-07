@@ -546,4 +546,13 @@ export class Grid<T = {}, C = string, R = string> {
   toRange(opts?: { local: true }): string {
     return this.origin.toRange({ right: this.columnLength - 1, bottom: this.rowLength - 1 }, opts);
   }
+
+  toGridRange(): sheets_v4.Schema$GridRange {
+    return {
+      startRowIndex: this.startRow,
+      endRowIndex: this.startRow + this.rowLength,
+      startColumnIndex: this.startColumn,
+      endColumnIndex: this.startColumn + this.columnLength,
+    };
+  }
 }
