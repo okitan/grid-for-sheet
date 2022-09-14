@@ -4,8 +4,8 @@ describe(Cell, () => {
   describe(".data", () => {
     test("with string returns stringValue", () => {
       expect(Cell.data("文字")).toMatchInlineSnapshot(`
-        Object {
-          "userEnteredValue": Object {
+        {
+          "userEnteredValue": {
             "stringValue": "文字",
           },
         }
@@ -14,8 +14,8 @@ describe(Cell, () => {
 
     test("with string starting with = returns formulaValue", () => {
       expect(Cell.data("=1+1")).toMatchInlineSnapshot(`
-        Object {
-          "userEnteredValue": Object {
+        {
+          "userEnteredValue": {
             "formulaValue": "=1+1",
           },
         }
@@ -24,8 +24,8 @@ describe(Cell, () => {
 
     test("with number returns numberValue", () => {
       expect(Cell.data(1)).toMatchInlineSnapshot(`
-        Object {
-          "userEnteredValue": Object {
+        {
+          "userEnteredValue": {
             "numberValue": 1,
           },
         }

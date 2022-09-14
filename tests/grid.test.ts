@@ -188,23 +188,23 @@ describe(Grid, () => {
       });
 
       expect(grid.toGridData()).toMatchInlineSnapshot(`
-        Object {
-          "rowData": Array [
-            Object {
-              "values": Array [
-                Object {
-                  "userEnteredFormat": Object {
+        {
+          "rowData": [
+            {
+              "values": [
+                {
+                  "userEnteredFormat": {
                     "textDirection": "1",
                   },
-                  "userEnteredValue": Object {
+                  "userEnteredValue": {
                     "stringValue": "文字",
                   },
                 },
-                Object {
-                  "userEnteredFormat": Object {
+                {
+                  "userEnteredFormat": {
                     "textDirection": "2",
                   },
-                  "userEnteredValue": Object {
+                  "userEnteredValue": {
                     "numberValue": 1,
                   },
                 },
@@ -226,11 +226,11 @@ describe(Grid, () => {
     });
 
     expect(grid.toGridData({})).toMatchInlineSnapshot(`
-      Object {
-        "rowData": Array [
-          Object {
-            "values": Array [
-              Object {},
+      {
+        "rowData": [
+          {
+            "values": [
+              {},
             ],
           },
         ],
@@ -261,177 +261,177 @@ describe(Grid, () => {
     });
 
     expect(grid.toGridData({ hoge: "fuga" })).toMatchInlineSnapshot(`
-      Object {
-        "columnMetadata": Array [
-          Object {},
-          Object {
+      {
+        "columnMetadata": [
+          {},
+          {
             "pixelSize": 7,
           },
-          Object {
+          {
             "pixelSize": 7,
           },
-          Object {
+          {
             "pixelSize": 7,
           },
-          Object {
+          {
             "pixelSize": 8,
           },
         ],
-        "rowData": Array [
-          Object {
-            "values": Array [
-              Object {
-                "userEnteredValue": Object {
+        "rowData": [
+          {
+            "values": [
+              {
+                "userEnteredValue": {
                   "stringValue": "",
                 },
               },
-              Object {
-                "userEnteredFormat": Object {
-                  "textFormat": Object {
+              {
+                "userEnteredFormat": {
+                  "textFormat": {
                     "bold": true,
                   },
                 },
-                "userEnteredValue": Object {
+                "userEnteredValue": {
                   "stringValue": "行1",
                 },
               },
-              Object {
-                "userEnteredFormat": Object {
-                  "textFormat": Object {
+              {
+                "userEnteredFormat": {
+                  "textFormat": {
                     "bold": true,
                   },
                 },
-                "userEnteredValue": Object {
+                "userEnteredValue": {
                   "stringValue": "行2",
                 },
               },
-              Object {
-                "userEnteredFormat": Object {
-                  "textFormat": Object {
+              {
+                "userEnteredFormat": {
+                  "textFormat": {
                     "bold": true,
                   },
                 },
-                "userEnteredValue": Object {
+                "userEnteredValue": {
                   "stringValue": "行3",
                 },
               },
-              Object {
-                "userEnteredValue": Object {
+              {
+                "userEnteredValue": {
                   "stringValue": "SUM",
                 },
               },
             ],
           },
-          Object {
-            "values": Array [
-              Object {
-                "userEnteredValue": Object {
+          {
+            "values": [
+              {
+                "userEnteredValue": {
                   "stringValue": "SUM",
                 },
               },
-              Object {
-                "userEnteredValue": Object {
+              {
+                "userEnteredValue": {
                   "formulaValue": "=SUM(B3:B4)",
                 },
               },
-              Object {
-                "userEnteredValue": Object {
+              {
+                "userEnteredValue": {
                   "formulaValue": "=SUM(C3:C4)",
                 },
               },
-              Object {
-                "userEnteredValue": Object {
+              {
+                "userEnteredValue": {
                   "formulaValue": "=SUM(D3:D4)",
                 },
               },
-              Object {
-                "userEnteredValue": Object {
+              {
+                "userEnteredValue": {
                   "formulaValue": "=SUM(B2:D2)",
                 },
               },
             ],
           },
-          Object {
-            "values": Array [
-              Object {
-                "userEnteredFormat": Object {
-                  "textFormat": Object {
+          {
+            "values": [
+              {
+                "userEnteredFormat": {
+                  "textFormat": {
                     "fontSize": 1,
                   },
                 },
-                "userEnteredValue": Object {
+                "userEnteredValue": {
                   "stringValue": "列1",
                 },
               },
-              Object {
-                "userEnteredFormat": Object {
+              {
+                "userEnteredFormat": {
                   "textDirection": "行1:0/列1:0",
                 },
-                "userEnteredValue": Object {
+                "userEnteredValue": {
                   "stringValue": "fuga:行1:0/列1:0",
                 },
               },
-              Object {
-                "userEnteredFormat": Object {
+              {
+                "userEnteredFormat": {
                   "textDirection": "行2:1/列1:0",
                 },
-                "userEnteredValue": Object {
+                "userEnteredValue": {
                   "stringValue": "fuga:行2:1/列1:0",
                 },
               },
-              Object {
-                "userEnteredFormat": Object {
+              {
+                "userEnteredFormat": {
                   "textDirection": "行3:2/列1:0",
                 },
-                "userEnteredValue": Object {
+                "userEnteredValue": {
                   "stringValue": "fuga:行3:2/列1:0",
                 },
               },
-              Object {
-                "userEnteredValue": Object {
+              {
+                "userEnteredValue": {
                   "formulaValue": "=SUM(B3:D3)",
                 },
               },
             ],
           },
-          Object {
-            "values": Array [
-              Object {
-                "userEnteredFormat": Object {
-                  "textFormat": Object {
+          {
+            "values": [
+              {
+                "userEnteredFormat": {
+                  "textFormat": {
                     "fontSize": 2,
                   },
                 },
-                "userEnteredValue": Object {
+                "userEnteredValue": {
                   "stringValue": "列2",
                 },
               },
-              Object {
-                "userEnteredFormat": Object {
+              {
+                "userEnteredFormat": {
                   "textDirection": "行1:0/列2:1",
                 },
-                "userEnteredValue": Object {
+                "userEnteredValue": {
                   "stringValue": "fuga:行1:0/列2:1",
                 },
               },
-              Object {
-                "userEnteredFormat": Object {
+              {
+                "userEnteredFormat": {
                   "textDirection": "行2:1/列2:1",
                 },
-                "userEnteredValue": Object {
+                "userEnteredValue": {
                   "stringValue": "fuga:行2:1/列2:1",
                 },
               },
-              Object {
-                "userEnteredFormat": Object {
+              {
+                "userEnteredFormat": {
                   "textDirection": "行3:2/列2:1",
                 },
-                "userEnteredValue": Object {
+                "userEnteredValue": {
                   "stringValue": "fuga:行3:2/列2:1",
                 },
               },
-              Object {
-                "userEnteredValue": Object {
+              {
+                "userEnteredValue": {
                   "formulaValue": "=SUM(B4:D4)",
                 },
               },
