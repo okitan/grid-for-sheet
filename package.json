@@ -27,7 +27,7 @@
     "typescript": "4.8.3"
   },
   "peerDependencies": {
-    "googleapis": "^107.0.0"
+    "googleapis": "^107.0.0 || ^108.0.0"
   },
   "typings": "./lib/index.d.ts"
 }
