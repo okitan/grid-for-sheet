@@ -1,4 +1,4 @@
-import { sheets_v4 } from "googleapis";
+import type { sheets_v4 } from "@googleapis/sheets";
 
 export class Cell {
   static data(data: string | number | undefined): sheets_v4.Schema$CellData {

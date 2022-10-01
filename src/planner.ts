@@ -1,4 +1,4 @@
-import { Grid, GridConstructor } from "./grid";
+import { Grid, type GridConstructor } from "./grid";
 
 export function createRightGrid<T = {}, C = string, R = string>(
   from: Grid<any, any, any>,
