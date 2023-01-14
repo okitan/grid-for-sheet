@@ -528,7 +528,7 @@ describe(Grid, () => {
     });
   });
 
-  describe("#getXlookupFunc", () => {
+  describe("#generateXlookupRowFunc", () => {
     test("works", () => {
       const grid = new Grid<{ hoge: string }, { fuga: string }, { ugu: string }>({
         column: {
@@ -545,7 +545,7 @@ describe(Grid, () => {
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column?.fuga}:${i}/${row?.ugu}:${j}` },
       });
 
-      expect(grid.generateXlookupFunc({ fuga: "行2" }, { ugu: "列2" })).toMatchInlineSnapshot(
+      expect(grid.generateXlookupRowFunc({ fuga: "行2" }, { ugu: "列2" })).toMatchInlineSnapshot(
         `"XLOOKUP("列2", A1:A4, C1:C4)"`
       );
     });

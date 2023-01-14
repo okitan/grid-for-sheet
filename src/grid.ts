@@ -572,7 +572,7 @@ export class Grid<T = {}, C = string, R = string> {
 
   /*
    */
-  generateXlookupFunc(column: C, row: R | string): string {
+  generateXlookupRowFunc(column: C, row: R | string): string {
     if (!this.showColumnHeader || !this.showRowHeader) throw new Error(`showColumnHeader and showRowHeader needed`);
 
     const rLabel = typeof row === "string" ? row : this.rowConverter ? this.rowConverter(row, NaN) : undefined;
