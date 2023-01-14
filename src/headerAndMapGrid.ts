@@ -20,7 +20,7 @@ export type HeaderAndMapGridConstructor<T, C, R> = {
     pixelSize?: number;
     headerFormat?: sheets_v4.Schema$CellFormat | ((row: R, rowIndex: number) => sheets_v4.Schema$CellFormat);
   };
-  lambda: string;
+  lambda: string | ((column: C, columnIndex: number, args: T) => string);
 };
 
 export class HeaderAndMapGrid<T = {}, C = string, R = string> {
@@ -35,7 +35,9 @@ export class HeaderAndMapGrid<T = {}, C = string, R = string> {
   readonly #column: HeaderAndMapGridConstructor<T, C, R>["column"];
   readonly #row: HeaderAndMapGridConstructor<T, C, R>["row"];
 
-  readonly lambda: string;
+  readonly lambda: HeaderAndMapGridConstructor<T, C, R>["lambda"];
+
+  #data: string[] | null = null;
 
   constructor({
     sheet,
@@ -59,6 +61,20 @@ export class HeaderAndMapGrid<T = {}, C = string, R = string> {
     this.lambda = lambda;
   }
 
+  generate(args: T) {
+    const lambda = this.lambda;
+    if (typeof lambda !== "function") throw new Error(`no dataGenerator set`);
+
+    this.#data = this.#column.items.map((e, i) => lambda(e, i, args));
+  }
+
+  get data(): string[] {
+    const data = this.#data;
+    if (!data) throw new Error(`no data given. generate needed`);
+
+    return data;
+  }
+
   toGridData(): sheets_v4.Schema$GridData {
     const gridData: sheets_v4.Schema$GridData = {
       startColumn: this.startColumn,
@@ -73,9 +89,11 @@ export class HeaderAndMapGrid<T = {}, C = string, R = string> {
 
               if (typeof label !== "string" && typeof label !== "number") throw new Error(`column should converted`);
 
+              const lambda = typeof this.lambda === "string" ? this.lambda : this.data[i];
+
               const data = Cell.data(`= {
   "${label}";
-  MAP(${this.rowsRange}, ${this.makeIndent(this.lambda, 2, true)})
+  MAP(${this.rowsRange}, ${this.makeIndent(lambda, 2, true)})
 }`);
 
               const userEnteredFormat = this.#column.headerFormat

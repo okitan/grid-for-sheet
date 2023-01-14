@@ -98,9 +98,9 @@ describe(HeaderAndMapGrid, () => {
       `);
     });
 
-    test("with converter works", () => {
+    test("with generation works", () => {
       // TODO:
-      const grid = new HeaderAndMapGrid({
+      const grid = new HeaderAndMapGrid<{ a: string }, { c: number }, { r: number }>({
         column: {
           items: [{ c: 1 }, { c: 2 }],
           converter: (e) => `c${e.c}`,
@@ -119,10 +119,12 @@ describe(HeaderAndMapGrid, () => {
             },
           }),
         },
-        lambda: `LAMBDA(r,
-  r
+        lambda: (e, i, args) => `LAMBDA(${args.a},
+  ${args.a}
 )`,
       });
+      grid.generate({ a: "a" });
+
       expect(grid.toGridData()).toMatchInlineSnapshot(`
         {
           "rowData": [
@@ -142,8 +144,8 @@ describe(HeaderAndMapGrid, () => {
                   "userEnteredValue": {
                     "formulaValue": "= {
           "c1";
-          MAP(A2:A4, LAMBDA(r,
-            r
+          MAP(A2:A4, LAMBDA(a,
+            a
           ))
         }",
                   },
@@ -157,8 +159,8 @@ describe(HeaderAndMapGrid, () => {
                   "userEnteredValue": {
                     "formulaValue": "= {
           "c2";
-          MAP(A2:A4, LAMBDA(r,
-            r
+          MAP(A2:A4, LAMBDA(a,
+            a
           ))
         }",
                   },
