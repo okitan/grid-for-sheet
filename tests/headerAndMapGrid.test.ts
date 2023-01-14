@@ -1,4 +1,4 @@
-import { HeaderAndMapGrid } from "../src/headerAndMapGrid";
+import { HeaderAndMapGrid } from "../src";
 
 describe(HeaderAndMapGrid, () => {
   describe("#toGridData", () => {
