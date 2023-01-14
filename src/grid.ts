@@ -452,6 +452,14 @@ export class Grid<T = {}, C = string, R = string> {
     return new Cell({ sheet: this.sheet, column: this.startColumn, row: this.startRow });
   }
 
+  get columnHeaderRange(): string | undefined {
+    return this.showColumnHeader ? this.origin.toRange({ right: this.columnLength - 1 }) : undefined;
+  }
+
+  get rowHeaderRange(): string | undefined {
+    return this.showRowHeader ? this.origin.toRange({ bottom: this.rowLength - 1 }) : undefined;
+  }
+
   get columnTotalHeaderOrigin(): Cell | undefined {
     return this.columnTotalHeader
       ? this.origin.relative({ right: this.showRowHeader ? 1 : 0, bottom: this.showColumnHeader ? 1 : 0 })
@@ -477,11 +485,27 @@ export class Grid<T = {}, C = string, R = string> {
     });
   }
 
+  findColumnHeaderCell(column: C): Cell | undefined {
+    const index = this.indexColumnOf(column);
+    if (index < 0) return;
+
+    return this.origin.relative({ right: this.showRowHeader ? index + 1 : index });
+  }
+
   findcolumnTotalHeaderCell(column: C): Cell | undefined {
     const index = this.indexColumnOf(column);
     if (index < 0) return;
 
     return this.columnTotalHeaderOrigin?.relative({ right: index });
+  }
+
+  findRowHeaderCell(row: R): Cell | undefined {
+    const index = this.indexRowOf(row);
+    if (index < 0) return;
+
+    return this.origin?.relative({
+      bottom: this.showColumnHeader ? (this.columnTotalHeader ? index + 2 : index + 1) : index,
+    });
   }
 
   findrowTotalCell(row: R): Cell | undefined {
@@ -557,5 +581,31 @@ export class Grid<T = {}, C = string, R = string> {
       startColumnIndex: this.startColumn,
       endColumnIndex: this.startColumn + this.columnLength,
     };
+  }
+
+  /*
+   * Function Generation
+   */
+  generateXlookupForRowFunc(column: C, row: R | string): string {
+    if (!this.showColumnHeader || !this.showRowHeader) throw new Error(`showColumnHeader and showRowHeader needed`);
+
+    const rLabel = typeof row === "string" ? row : this.rowConverter ? this.rowConverter(row, NaN) : undefined;
+    if (!rLabel) throw new Error(`set row converter`);
+
+    return `XLOOKUP("${rLabel}", ${this.rowHeaderRange}, ${this.findColumnHeaderCell(column)!.toRange({
+      bottom: this.columnLength - 1,
+    })})`;
+  }
+
+  generateXlookupForColumnFunc(column: C | string, row: R): string {
+    if (!this.showColumnHeader || !this.showRowHeader) throw new Error(`showColumnHeader and showRowHeader needed`);
+
+    const cLabel =
+      typeof column === "string" ? column : this.columnConverter ? this.columnConverter(column, NaN) : undefined;
+    if (!cLabel) throw new Error(`set row converter`);
+
+    return `XLOOKUP("${cLabel}", ${this.columnHeaderRange}, ${this.findRowHeaderCell(row)!.toRange({
+      right: this.rowLength - 1,
+    })})`;
   }
 }
