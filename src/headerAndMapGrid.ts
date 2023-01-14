@@ -8,20 +8,17 @@ export type HeaderAndMapGridConstructor<T, C, R> = {
   startColumn?: number;
   startRow?: number;
   label?: string;
-  column: (C extends string
-    ? { items: string[] }
-    : C extends number
-    ? { items: number[] }
-    : { items: C[]; converter: (column: C, columnIndex: number) => string | number }) & {
+  column: {
+    items: C[];
+    converter?: (column: C, columnIndex: number) => string | number;
     pixelSize?: number;
-    headerFormat?: sheets_v4.Schema$CellFormat;
+    headerFormat?: sheets_v4.Schema$CellFormat | ((column: C, columnIndex: number) => sheets_v4.Schema$CellFormat);
   };
-  row: (R extends string
-    ? { items: string[] }
-    : R extends number
-    ? { items: number[] }
-    : { items: R[]; converter: (row: R, rowIndex: number) => string | number }) & {
+  row: {
+    items: R[];
+    converter?: (row: R, rowIndex: number) => string | number;
     pixelSize?: number;
+    headerFormat?: sheets_v4.Schema$CellFormat | ((row: R, rowIndex: number) => sheets_v4.Schema$CellFormat);
   };
   lambda: string;
 };
@@ -63,29 +60,49 @@ export class HeaderAndMapGrid<T = {}, C = string, R = string> {
   }
 
   toGridData(): sheets_v4.Schema$GridData {
-    const column = this.#column; // umhhhh...
-    const columnLabels = "converter" in column ? column.items.map((e, i) => column.converter(e, i)) : column.items;
-
-    const row = this.#row;
-    const rowLabels = "converter" in row ? row.items.map((e, i) => row.converter(e, i)) : row.items;
-
     const gridData: sheets_v4.Schema$GridData = {
       startColumn: this.startColumn,
       startRow: this.startRow,
       rowData: [
+        // header
         {
           values: [
             Cell.data(this.gridLabel),
-            ...columnLabels.map((e, i) => {
+            ...this.#column.items.map((e, i) => {
+              const label = this.#column.converter ? this.#column.converter(e, i) : e;
+
+              if (typeof label !== "string" && typeof label !== "number") throw new Error(`column should converted`);
+
               const data = Cell.data(`= {
-  "${e}";
+  "${label}";
   MAP(${this.rowsRange}, ${this.makeIndent(this.lambda, 2, true)})
 }`);
-              return this.#column.headerFormat ? { userEnteredFormat: this.#column.headerFormat, ...data } : data;
+
+              const userEnteredFormat = this.#column.headerFormat
+                ? typeof this.#column.headerFormat === "function"
+                  ? this.#column.headerFormat(e, i)
+                  : this.#column.headerFormat
+                : undefined;
+
+              return userEnteredFormat ? { userEnteredFormat, ...data } : data;
             }),
           ],
         },
-        ...rowLabels.map((e) => ({ values: [Cell.data(e)] })),
+        // rows
+        ...this.#row.items.map((e, i) => {
+          const label = this.#row.converter ? this.#row.converter(e, i) : e;
+          if (typeof label !== "string" && typeof label !== "number") throw new Error(`row should converted`);
+
+          const userEnteredFormat = this.#row.headerFormat
+            ? typeof this.#row.headerFormat === "function"
+              ? this.#row.headerFormat(e, i)
+              : this.#row.headerFormat
+            : undefined;
+
+          return userEnteredFormat
+            ? { values: [{ userEnteredFormat, ...Cell.data(label) }] }
+            : { values: [Cell.data(label)] };
+        }),
       ],
     };
 
