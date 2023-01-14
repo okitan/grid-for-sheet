@@ -528,7 +528,7 @@ describe(Grid, () => {
     });
   });
 
-  describe("#generateXlookupRowFunc", () => {
+  describe("#generateXlookupForRowFunc", () => {
     test("works", () => {
       const grid = new Grid<{ hoge: string }, { fuga: string }, { ugu: string }>({
         column: {
@@ -545,9 +545,32 @@ describe(Grid, () => {
         data: { generator: (column, i, row, j, args) => `${args.hoge}:${column?.fuga}:${i}/${row?.ugu}:${j}` },
       });
 
-      expect(grid.generateXlookupRowFunc({ fuga: "行2" }, { ugu: "列2" })).toMatchInlineSnapshot(
+      expect(grid.generateXlookupForRowFunc({ fuga: "行2" }, { ugu: "列2" })).toMatchInlineSnapshot(
         `"XLOOKUP("列2", A1:A4, C1:C4)"`
       );
+    });
+
+    describe("#generateXlookupForColumnFunc", () => {
+      test("works", () => {
+        const grid = new Grid<{ hoge: string }, { fuga: string }, { ugu: string }>({
+          column: {
+            items: [{ fuga: "行1" }, { fuga: "行2" }],
+            showHeader: true,
+            converter: (column) => `${column.fuga}`,
+          },
+          row: {
+            items: [{ ugu: "列1" }, { ugu: "列2" }],
+            showHeader: true,
+            converter: (row) => `${row.ugu}`,
+          },
+          sum: { column: { label: "列計" }, row: { label: "総計" } },
+          data: { generator: (column, i, row, j, args) => `${args.hoge}:${column?.fuga}:${i}/${row?.ugu}:${j}` },
+        });
+
+        expect(grid.generateXlookupForColumnFunc({ fuga: "行2" }, { ugu: "列2" })).toMatchInlineSnapshot(
+          `"XLOOKUP("行2", A1:D1, A4:D4)"`
+        );
+      });
     });
   });
 });
