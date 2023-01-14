@@ -527,4 +527,27 @@ describe(Grid, () => {
       expect(grid.findDataCell({ column: "行3", row: "列1" })?.notation).toEqual("D3");
     });
   });
+
+  describe("#getXlookupFunc", () => {
+    test("works", () => {
+      const grid = new Grid<{ hoge: string }, { fuga: string }, { ugu: string }>({
+        column: {
+          items: [{ fuga: "行1" }, { fuga: "行2" }],
+          showHeader: true,
+          converter: (column) => `${column.fuga}`,
+        },
+        row: {
+          items: [{ ugu: "列1" }, { ugu: "列2" }],
+          showHeader: true,
+          converter: (row) => `${row.ugu}`,
+        },
+        sum: { column: { label: "列計" }, row: { label: "総計" } },
+        data: { generator: (column, i, row, j, args) => `${args.hoge}:${column?.fuga}:${i}/${row?.ugu}:${j}` },
+      });
+
+      expect(grid.generateXlookupFunc({ fuga: "行2" }, { ugu: "列2" })).toMatchInlineSnapshot(
+        `"XLOOKUP("列2", A1:A4, C1:C4)"`
+      );
+    });
+  });
 });
