@@ -4,18 +4,39 @@ describe(HeaderAndMapGrid, () => {
   describe("#toGridData", () => {
     test("works", () => {
       const grid = new HeaderAndMapGrid({
-        column: { items: ["c1", "c2"] },
-        row: { items: ["r1", "r2"] },
+        column: { items: ["c1", "c2"], headerFormat: { backgroundColor: { red: 1 } }, pixelSize: 56 },
+        row: { items: ["r1", "r2"], pixelSize: 24 },
         lambda: `LAMBDA(r,
   r
 )`,
       });
       expect(grid.toGridData()).toMatchInlineSnapshot(`
         {
+          "columnMetadata": [
+            {
+              "pixelSize": 24,
+            },
+            {
+              "pixelSize": 56,
+            },
+            {
+              "pixelSize": 56,
+            },
+          ],
           "rowData": [
             {
               "values": [
                 {
+                  "userEnteredValue": {
+                    "stringValue": "",
+                  },
+                },
+                {
+                  "userEnteredFormat": {
+                    "backgroundColor": {
+                      "red": 1,
+                    },
+                  },
                   "userEnteredValue": {
                     "formulaValue": "= {
           "c1";
@@ -26,6 +47,11 @@ describe(HeaderAndMapGrid, () => {
                   },
                 },
                 {
+                  "userEnteredFormat": {
+                    "backgroundColor": {
+                      "red": 1,
+                    },
+                  },
                   "userEnteredValue": {
                     "formulaValue": "= {
           "c2";
@@ -76,6 +102,11 @@ describe(HeaderAndMapGrid, () => {
           "rowData": [
             {
               "values": [
+                {
+                  "userEnteredValue": {
+                    "stringValue": "",
+                  },
+                },
                 {
                   "userEnteredValue": {
                     "formulaValue": "= {

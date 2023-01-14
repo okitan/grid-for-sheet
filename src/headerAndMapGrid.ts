@@ -14,6 +14,7 @@ export type HeaderAndMapGridConstructor<T, C, R> = {
     ? { items: number[] }
     : { items: C[]; converter: (column: C, columnIndex: number) => string | number }) & {
     pixelSize?: number;
+    headerFormat?: sheets_v4.Schema$CellFormat;
   };
   row: (R extends string
     ? { items: string[] }
@@ -68,21 +69,34 @@ export class HeaderAndMapGrid<T = {}, C = string, R = string> {
     const row = this.#row;
     const rowLabels = "converter" in row ? row.items.map((e, i) => row.converter(e, i)) : row.items;
 
-    return {
+    const gridData: sheets_v4.Schema$GridData = {
       startColumn: this.startColumn,
       startRow: this.startRow,
       rowData: [
         {
-          values: columnLabels.map((e) =>
-            Cell.data(`= {
+          values: [
+            Cell.data(this.gridLabel),
+            ...columnLabels.map((e, i) => {
+              const data = Cell.data(`= {
   "${e}";
   MAP(${this.rowsRange}, ${this.makeIndent(this.lambda, 2, true)})
-}`)
-          ),
+}`);
+              return this.#column.headerFormat ? { userEnteredFormat: this.#column.headerFormat, ...data } : data;
+            }),
+          ],
         },
         ...rowLabels.map((e) => ({ values: [Cell.data(e)] })),
       ],
     };
+
+    if (this.#row.pixelSize || this.#column.pixelSize) {
+      gridData.columnMetadata = [
+        this.#row.pixelSize ? { pixelSize: this.#row.pixelSize } : {},
+        ...(this.#column.pixelSize ? this.#column.items.map((e) => ({ pixelSize: this.#column.pixelSize })) : []),
+      ];
+    }
+
+    return gridData;
   }
 
   /*
