@@ -4,13 +4,12 @@ on:
   release:
     types: [created]
 
-permissions:
-  id-token: write # for OIDC
-  contents: read
-
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # for OIDC
+      contents: read
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
