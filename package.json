@@ -4,7 +4,7 @@
   "description": "",
   "main": "./lib/index.js",
   "scripts": {
-    "test": "jest",
+    "test": "vitest run",
     "build": "rm -rf lib && tsc --build tsconfig.build.json",
     "build:check": "tsc --noEmit"
   },
@@ -20,11 +20,9 @@
   },
   "homepage": "https://github.com/okitan/grid-for-sheet#readme",
   "devDependencies": {
-    "@types/jest": "30.0.0",
     "prettier": "3.9.6",
-    "ts-jest": "29.4.12",
-    "ts-node": "10.9.2",
-    "typescript": "5.9.3"
+    "typescript": "7.0.2",
+    "vitest": "4.1.1"
   },
   "peerDependencies": {
     "@googleapis/sheets": ">= 13.0.0"
