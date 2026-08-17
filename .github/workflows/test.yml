@@ -14,10 +14,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: test
-        uses: mattallty/jest-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: npm test
   build:
     runs-on: ubuntu-latest
 
