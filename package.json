@@ -22,7 +22,7 @@
   "devDependencies": {
     "prettier": "3.9.6",
     "typescript": "7.0.2",
-    "vitest": "4.1.10"
+    "vitest": "4.1.11"
   },
   "peerDependencies": {
     "@googleapis/sheets": ">= 13.0.0"
